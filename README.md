@@ -16,4 +16,6 @@ Use Gradle instead of Eclipse
 
 Use a build management system from the begining
 
+Open the project in IJ only after it's been fully initialized
+
 
