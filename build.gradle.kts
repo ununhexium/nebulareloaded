@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val assertJVersion = "3.10.0"
+val guavaVersion = "25.1-jre"
 val junitPlatformVersion = "1.2.0"
 val junitJupiterVersion = "5.2.0"
 val springShellVersion = "2.0.1.RELEASE"
@@ -51,11 +52,17 @@ idea {
 }
 
 repositories {
+  mavenLocal()
   mavenCentral()
   jcenter()
 }
 
 dependencies {
+
+  compile("com.google.guava:guava:$guavaVersion")
+
+  compile("net.lab0.kotlin.more:morekotlin:0.1.2")
+
   compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
   compile("org.jetbrains.kotlin:kotlin-reflect")
 

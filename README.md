@@ -14,8 +14,16 @@ Start with the SCM as the first step of the project instead of adding it later
 
 Use Gradle instead of Eclipse
 
-Use a build management system from the begining
+Use a build management system from the beginning
 
 Open the project in IJ only after it's been fully initialized
 
+Update all the dependencies
 
+Start writing tests instead of starting writing implementations.
+
+Abstract more elements behind interfaces.
+
+Much faster to develop, the time spent on tests is also much longer.
+
+Refactoring immediately instead of later.
