@@ -1,9 +1,6 @@
 package net.lab0.nebula.reloaded.tree
 
 import com.google.common.collect.Lists
-import net.lab0.nebula.reloaded.max
-import net.lab0.nebula.reloaded.min
-import net.lab0.nebula.reloaded.toDouble
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.UNDEFINED
 import net.lab0.tools.delegated.NullableSetOnce
@@ -23,23 +20,6 @@ class TreeNode(
     val metadata: MetaData,
     val parent: TreeNode? = null
 ) {
-  /**
-   * Convenience constructor to be able to use any kind of number as boundaries.
-   */
-  constructor(
-      minX: Number,
-      maxX: Number,
-      minY: Number,
-      maxY: Number,
-      metadata: MetaData,
-      parent: TreeNode? = null
-  ) : this(
-      RectangleImpl(
-          minX, maxX, minY, maxY
-      ),
-      metadata,
-      parent
-  )
 
   /**
    * Convenience constructor to build a rectangle based only on bounds.
@@ -51,12 +31,7 @@ class TreeNode(
       metadata: MetaData,
       parent: TreeNode? = null
   ) : this(
-      RectangleImpl(
-          xRange.toDouble().min(),
-          xRange.toDouble().max(),
-          yRange.toDouble().min(),
-          yRange.toDouble().max()
-      ),
+      RectangleImpl(xRange, yRange),
       metadata,
       parent
   )
@@ -96,34 +71,26 @@ class TreeNode(
   fun split() {
     children = arrayOf(
         TreeNode(
-            position.minX,
-            position.midX,
-            position.minY,
-            position.midY,
+            position.minX to position.midX,
+            position.minY to position.midY,
             metadata,
             this
         ),
         TreeNode(
-            position.midX,
-            position.maxX,
-            position.minY,
-            position.midY,
+            position.midX to position.maxX,
+            position.minY to position.midY,
             metadata,
             this
         ),
         TreeNode(
-            position.minX,
-            position.midX,
-            position.midY,
-            position.maxY,
+            position.minX to position.midX,
+            position.midY to position.maxY,
             metadata,
             this
         ),
         TreeNode(
-            position.midX,
-            position.maxX,
-            position.midY,
-            position.maxY,
+            position.midX to position.maxX,
+            position.midY to position.maxY,
             metadata,
             this
         )
@@ -157,7 +124,12 @@ class TreeNode(
     if (shouldSplit()) split()
   }
 
-  fun getNodesBreadthFirst(filter: (self: TreeNode) -> Boolean): List<TreeNode> {
+  /**
+   * @param filter Default to accepting all the nodes
+   */
+  fun getNodesBreadthFirst(
+      filter: (self: TreeNode) -> Boolean = { true }
+  ): List<TreeNode> {
     val collector = ArrayList<TreeNode>()
     if (filter(this)) collector.add(this)
     getNodesBreadthFirst(collector, filter)
@@ -170,7 +142,7 @@ class TreeNode(
   ) {
     if (hasChildren()) {
       children!!.forEach {
-        if (filter(this)) collector.add(it)
+        if (filter(it)) collector.add(it)
       }
       children!!.forEach {
         it.getNodesBreadthFirst(collector, filter)
@@ -191,7 +163,7 @@ class TreeNode(
 //    return self + children
 //  }
 
-  private fun hasChildren() = children != null
+  fun hasChildren() = children != null
 
   /**
    * Unsafe get children at provided index.

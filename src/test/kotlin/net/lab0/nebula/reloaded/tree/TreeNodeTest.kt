@@ -19,37 +19,69 @@ class TreeNodeTest {
     val metadata = MetaData(128, 8, Optim2)
 
     fun defaultMandelbrotArea() =
-        TreeNode(-2, 2, -2, 2, metadata)
+        TreeNode(-2 to 2, -2 to 2, metadata)
   }
 
   @Test
   fun `split the node in 4 equal parts`() {
-    val node = TreeNode(0, 1, 0, 1, metadata)
+    val node = TreeNode(0 to 1, 0 to 1, metadata)
     node.split()
 
     assertThat(node.children).hasSize(4)
 
     assertThat(node.children!![0].position)
-        .isEqualTo(RectangleImpl(0, 0.5, 0, 0.5))
+        .isEqualTo(RectangleImpl(0 to 0.5, 0 to 0.5))
 
     assertThat(node.children!![1].position)
-        .isEqualTo(RectangleImpl(0.5, 1, 0, 0.5))
+        .isEqualTo(RectangleImpl(0.5 to 1, 0 to 0.5))
 
     assertThat(node.children!![2].position)
-        .isEqualTo(RectangleImpl(0, 0.5, 0.5, 1))
+        .isEqualTo(RectangleImpl(0 to 0.5, 0.5 to 1))
 
     assertThat(node.children!![3].position)
-        .isEqualTo(RectangleImpl(0.5, 1, 0.5, 1))
+        .isEqualTo(RectangleImpl(0.5 to 1, 0.5 to 1))
 
     node.children!!.forEach {
       assertThat(it.parent).isNotNull
+
+      node[2].split()
+      assertThat(node[2][0].position)
+          .isEqualTo(RectangleImpl(0 to 0.25, 0.5 to 0.75))
+    }
+  }
+
+  @Test
+  fun `split the node in 4 equal parts in negative values`() {
+    val node = TreeNode(-1 to 0, -1 to 0, metadata)
+    node.split()
+
+    assertThat(node.children).hasSize(4)
+
+    assertThat(node.children!![0].position)
+        .isEqualTo(RectangleImpl(-1 to -0.5, -1 to -0.5))
+
+    assertThat(node.children!![1].position)
+        .isEqualTo(RectangleImpl(-0.5 to 0, -1 to -0.5))
+
+    assertThat(node.children!![2].position)
+        .isEqualTo(RectangleImpl(-1 to -0.5, -0.5 to 0))
+
+    assertThat(node.children!![3].position)
+        .isEqualTo(RectangleImpl(-0.5 to 0, -0.5 to 0))
+
+    node.children!!.forEach {
+      assertThat(it.parent).isNotNull
+
+      node[2].split()
+      assertThat(node[2][0].position)
+          .isEqualTo(RectangleImpl(-1 to -0.75, -0.5 to -0.25))
     }
   }
 
   @Test
   fun `at creation, a node doesn't have a status`() {
     assertThat(
-        TreeNode(0, 0, 0, 0, metadata).payload.status
+        TreeNode(0 to 1, 0 to 1, metadata).payload.status
     ).isEqualTo(UNDEFINED)
   }
 
@@ -127,6 +159,41 @@ class TreeNodeTest {
         node[BOTTOM_LEFT][TOP_RIGHT][3]
     )
 
+    assertThat(leaves).isEqualTo(expected)
+  }
+
+  @Test
+  fun `can get all leaves`() {
+    val node = defaultMandelbrotArea()
+    node.compute()
+    node[BOTTOM_LEFT].compute()
+
+    val leaves = node.getNodesBreadthFirst { !it.hasChildren() }
+    val expected = listOf(
+
+        node[BOTTOM_RIGHT],
+        node[TOP_LEFT],
+        node[TOP_RIGHT],
+
+        node[BOTTOM_LEFT][0],
+        node[BOTTOM_LEFT][1],
+        node[BOTTOM_LEFT][2],
+        node[BOTTOM_LEFT][3]
+    )
+    assertThat(leaves).isEqualTo(expected)
+  }
+
+  @Test
+  fun `can get all branches (non leaf)`() {
+    val node = defaultMandelbrotArea()
+    node.compute()
+    node[BOTTOM_LEFT].compute()
+
+    val leaves = node.getNodesBreadthFirst { it.hasChildren() }
+    val expected = listOf(
+        node,
+        node[BOTTOM_LEFT]
+    )
     assertThat(leaves).isEqualTo(expected)
   }
 }

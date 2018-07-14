@@ -17,7 +17,7 @@ interface Rectangle {
    * Middle in Y
    */
   val midY
-    get() = (minX + maxX) / 2.0
+    get() = (minY + maxY) / 2.0
 
   val rangeX
     get() = maxX - minX
