@@ -17,7 +17,8 @@ class NodeImageWrapper(
     /**
      * Percentage of the width / height
      */
-    val margin: Double = 0.1
+    margin: Double = 0.1,
+    val threadshold: Int = 4
 ) {
 
   val ratio = width / height.toDouble()
@@ -39,6 +40,15 @@ class NodeImageWrapper(
     node.position.rangeX / height / ratio
   } / (1 - margin)
 
+
+  val context = CoordinatesContext(
+      pixelHeight,
+      node.position.midX,
+      node.position.midY,
+      xCenter,
+      yCenter
+  )
+
   fun toImage(): BufferedImage {
     val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
     renderMandelbrot(image)
@@ -55,14 +65,9 @@ class NodeImageWrapper(
 
     (0 until raster.height).forEach { y ->
       (0 until raster.width).forEach { x ->
-        val (real, img) = toPlan(x, y)
+        val (real, img) = ImageCoordinates(x, y, context).toPlan()
         val iterations = node.metadata.iterationsAt(real, img)
-        val color = when (iterations) {
-          node.metadata.iterationLimit -> IntArray(3) { 255 }
-          else -> IntArray(3) {
-            (iterations * 255 / 2 / node.metadata.iterationLimit).toInt()
-          }
-        }
+        val color = computeColor(iterations)
         raster.setPixel(x, y, color)
       }
     }
@@ -70,34 +75,66 @@ class NodeImageWrapper(
     image.data = raster
   }
 
+  private fun computeColor(iterations: Long): IntArray {
+    return when (iterations) {
+      node.metadata.iterationLimit -> IntArray(3) { 255 }
+      else -> IntArray(3) {
+        (iterations * 255 / 2 / node.metadata.iterationLimit).toInt()
+      }
+    }
+  }
+
   private fun renderAreas(image: BufferedImage) {
     val nodes = node.getNodesBreadthFirst { !it.hasChildren() }
     val g = image.graphics as Graphics2D
     nodes.forEach { node ->
       val color = when (node.payload.status) {
-        UNDEFINED -> Color(255, 0, 0)
-        OUTSIDE -> Color(255, 255, 0)
-        INSIDE -> Color(255, 0, 255)
-        EDGE -> Color(0, 255, 255)
+        UNDEFINED -> Color(255, 255, 255)
+        OUTSIDE -> Color(0, 128, 0)
+        INSIDE -> Color(200, 100, 0)
+        EDGE -> Color(0, 100, 200)
       }
 
-      g.paint = color
       val topLeft = toRaster(node.position.minX, node.position.maxY)
       val bottomRight = toRaster(node.position.maxX, node.position.minY)
-      g.drawRect(
-          topLeft.first,
-          topLeft.second,
-          bottomRight.first - topLeft.first - 1,
-          bottomRight.second - topLeft.second - 1
-      )
+      val x = topLeft.first
+      val y = topLeft.second
+      val width = bottomRight.first - topLeft.first
+      val height = bottomRight.second - topLeft.second
+
+      if (width > threadshold) {
+        paintAsRegular(g, color, x, y, width, height)
+      }
+      else {
+        paintAsUnavailable(g, x, y, width, height)
+      }
     }
   }
 
-  private fun toPlan(x: Int, y: Int): Pair<Double, Double> {
-    return Pair(
-        pixelWidth * (x - xCenter) + node.position.midX,
-        -pixelHeight * (y - yCenter) + node.position.midY
-    )
+  private fun paintAsRegular(
+      g: Graphics2D,
+      color: Color,
+      x: Int,
+      y: Int,
+      width: Int,
+      height: Int
+  ) {
+    g.paint = color.withAlpha(0.25)
+    g.fillRect(x + 1, y + 1, width - 2, height - 2)
+    g.paint = color.withAlpha(0.5)
+    g.drawRect(x, y, width - 1, height - 1)
+  }
+
+  private fun paintAsUnavailable(
+      g: Graphics2D,
+      x: Int,
+      y: Int,
+      width: Int,
+      height: Int
+  ) {
+    val color = Color(128, 128, 128)
+    g.paint = color.withAlpha(0.5)
+    g.fillRect(x, y, width, height)
   }
 
   /**
@@ -107,7 +144,6 @@ class NodeImageWrapper(
    * (x-xc) = (real - nmx) / pw
    * x = ((real - nmx) / pw) + xc
    */
-
   private fun toRaster(real: Double, img: Double): Pair<Int, Int> {
     return Pair(
         (((real - node.position.midX) / pixelWidth) + xCenter).toInt(),
