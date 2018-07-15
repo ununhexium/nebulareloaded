@@ -17,6 +17,9 @@ class MandelbrotRenderer(
             LoggerFactory
                 .getLogger(this::class.java.name)
         }
+
+        val BLACK = IntArray(3) { 0 }
+        val GRAY = IntArray(3) { 128 }
     }
 
     fun render(
@@ -40,17 +43,21 @@ class MandelbrotRenderer(
             prepare(raster, context, reals, imgs)
         }
 
-        val iterations = AtomicReference<LongArray>()
+        val iterationsRef = AtomicReference<LongArray>()
         val computeTime = measureNanoTime {
-            iterations
+            iterationsRef
                 .set(computeEngine.iterationsAt(reals, imgs, iterationLimit))
         }
 
         val finishTime = measureNanoTime {
-            iterations.get().mapIndexed { index, value ->
+            val iterations = iterationsRef.get()
+            iterations.mapIndexed { index, value ->
                 val color = computeColor(value, iterationLimit)
-                raster
-                    .setPixel(index % raster.width, index / raster.width, color)
+                raster.setPixel(
+                    index % raster.width,
+                    index / raster.width,
+                    color
+                )
             }
         }
 
@@ -84,13 +91,12 @@ class MandelbrotRenderer(
         }
     }
 
-    private fun computeColor(iterations: Long, iterationLimit: Long): IntArray {
-        return when (iterations) {
-            iterationLimit -> IntArray(3) { 255 }
-            else -> IntArray(3) {
-                (iterations * 255 / 2 / iterationLimit).toInt()
-            }
-        }
+    private inline fun computeColor(
+        iterations: Long,
+        iterationLimit: Long
+    ): IntArray {
+        val scaled = iterations * 255 / iterationLimit
+        return if (scaled == 255L) BLACK else IntArray(3) { scaled.toInt() }
     }
 }
 
