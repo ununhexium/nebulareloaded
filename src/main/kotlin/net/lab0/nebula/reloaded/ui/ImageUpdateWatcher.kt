@@ -10,7 +10,7 @@ import java.util.concurrent.BlockingQueue
  */
 class ImageUpdateWatcher(
     val panel: MandelbrotPanel,
-    val queue: BlockingQueue<Object>
+    val queue: BlockingQueue<Any>
 ) : Runnable {
 
     companion object {

@@ -33,7 +33,7 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
 
     private var updatePositionLabelsOnMove = true
     private var press: MouseEvent? = null
-    private var positionDrag: MouseEvent? = null
+    private var lastMousePosition: MouseEvent? = null
 
     override fun keyTyped(e: KeyEvent) {
         if (e.keyCode == KeyEvent.VK_ESCAPE) {
@@ -72,18 +72,24 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
 
     override fun mouseDragged(e: MouseEvent) {
         if (e.isControlDown) {
-            panel.setSelectionBox(press to e)
-            panel.repaint()
+            val tmpPress = press
+            if (tmpPress != null) {
+                panel.setSelectionBox(tmpPress to e)
+                panel.repaint()
+            }
         }
         else {
             panel.setSelectionBox(null)
-            panel.moveImage(positionDrag to e)
-            positionDrag = e
+            val tmpLastMousePosition = lastMousePosition
+            if (tmpLastMousePosition != null) {
+                panel.moveImage(tmpLastMousePosition to e)
+            }
+            lastMousePosition = e
         }
     }
 
     override fun mouseMoved(e: MouseEvent) {
-        positionDrag = e
+        lastMousePosition = e
         if (updatePositionLabelsOnMove) {
             updateLabels(e)
         }

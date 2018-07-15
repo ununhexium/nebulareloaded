@@ -41,10 +41,14 @@ public class TreeBrowser {
   }
 
   private void linkMandelbrotPanel() {
+    /*
+     * That's ugly...
+     * Deal with it until this is converted to Java.
+     */
     mandelbrotPanel.setRealValueLabel(realValue);
     mandelbrotPanel.setImgValueLabel(imgValue);
-    mandelbrotPanel.setxValueLabel(xValue);
-    mandelbrotPanel.setyValueLabel(yValue);
+    mandelbrotPanel.setXValueLabel(xValue);
+    mandelbrotPanel.setYValueLabel(yValue);
 
     MandelbrotActions mandelbrotActions = new MandelbrotActions(mandelbrotPanel);
 
