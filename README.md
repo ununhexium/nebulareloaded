@@ -34,3 +34,7 @@ Testing coordinates conversion before using them is much more efficient.
 
 Coordinates conversion are *not that easy*.
 
+Writing smaller classes, splitting the code regularly as classes have too much logic in them.
+
+Multithreading GUI update is still not trivial.
+

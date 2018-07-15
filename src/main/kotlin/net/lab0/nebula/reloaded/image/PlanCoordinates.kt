@@ -6,7 +6,13 @@ class PlanCoordinates @JvmOverloads constructor(
     val img: Double = 0.0
 ) {
   constructor(
-      real:Number,
-      img:Number
-  ): this(real.toDouble(), img.toDouble())
+      real: Number,
+      img: Number
+  ) : this(real.toDouble(), img.toDouble())
+
+  /**
+   * Vector difference
+   */
+  operator fun minus(other: PlanCoordinates) =
+      PlanCoordinates(this.real - other.real, this.img - other.img)
 }

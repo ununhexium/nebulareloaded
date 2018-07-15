@@ -16,7 +16,7 @@ class NodeImageWrapperTest {
 
     listOf(256, 512).forEach { width ->
       listOf(256, 512).forEach { height ->
-        listOf(0.0, 0.5).forEach { margin ->
+        listOf(1.0, 0.5).forEach { margin ->
           val image = NodeImageWrapper(node, width, height, margin).toImage()
           save(image, "out/test/image/$width-$height-$margin", "png")
         }
@@ -28,12 +28,11 @@ class NodeImageWrapperTest {
   fun `can limit the rendering depth`() {
     val node = TreeNodeTest.defaultMandelbrotArea()
     (1..5).forEach {
-      node.getNodesBreadthFirst { it.payload.status == UNDEFINED }.forEach {
-        it.compute()
-      }
+      node.getNodesBreadthFirst { it.payload.status == UNDEFINED }
+          .forEach { it.compute() }
     }
 
-    val image = NodeImageWrapper(node, 1024, 1024, 0.1).toImage()
+    val image = NodeImageWrapper(node, 1024, 1024, 0.9).toImage()
     save(image, "out/test/image/limit_depth", "png")
   }
 }

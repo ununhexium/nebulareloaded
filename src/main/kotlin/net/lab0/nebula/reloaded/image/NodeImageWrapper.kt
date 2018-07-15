@@ -16,10 +16,10 @@ class NodeImageWrapper(
     /**
      * Percentage of the width / height
      */
-    margin: Double = 0.1,
+    zoomFactor: Double = 0.9,
     val threadshold: Int = 4
 ) {
-  val viewport = PlanViewport(node.position)
+  val viewport = PlanViewport(node.position).zoom(zoomFactor)
   val rasterizationContext = RasterizationContext(viewport, width, height)
 
   fun toImage(): BufferedImage {
