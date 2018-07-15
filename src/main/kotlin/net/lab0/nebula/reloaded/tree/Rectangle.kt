@@ -1,5 +1,7 @@
 package net.lab0.nebula.reloaded.tree
 
+import net.lab0.nebula.reloaded.image.PlanCoordinates
+
 interface Rectangle {
   val minX: Double
   val maxX: Double
@@ -19,17 +21,23 @@ interface Rectangle {
   val midY
     get() = (minY + maxY) / 2.0
 
-  val rangeX
+  val width
     get() = maxX - minX
 
-  val rangeY
+  val height
     get() = maxY - minY
+
+  val xRange
+    get() = minX to maxX
+
+  val yRange
+    get() = minY to maxY
 
   /**
    * Values of X in the range minX (included), maxX (included) and `splits - 2` values in between. The value of split must be >= 1
    */
   fun listOfX(splits: Int): List<Double> {
-    val step = rangeX / splits
+    val step = width / splits
     return listOf(minX) +
         (1 until splits).map { minX + step * it } +
         listOf(maxX)
@@ -39,7 +47,7 @@ interface Rectangle {
    * Values of X in the range minX (included), maxX (included) and `splits - 2` values in between. The value of split must be >= 1
    */
   fun listOfY(splits: Int): List<Double> {
-    val step = rangeY / splits
+    val step = height / splits
     return listOf(minY) +
         (1 until splits).map { minY + step * it } +
         listOf(maxY)
@@ -48,5 +56,17 @@ interface Rectangle {
 
   val yMinMidMax
     get() = listOf(minY, midY, maxY)
+
+  val topLeft
+    get() = PlanCoordinates(minX, maxY)
+
+  val topRight
+    get() = PlanCoordinates(maxX, maxY)
+
+  val bottomLeft
+    get() = PlanCoordinates(minX, minY)
+
+  val bottomRight
+    get() = PlanCoordinates(maxX, minY)
 }
 

@@ -8,7 +8,6 @@ import net.lab0.nebula.reloaded.tree.TreeNode
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
-import java.awt.image.WritableRaster
 
 class NodeImageWrapper(
     val node: TreeNode,
@@ -20,68 +19,24 @@ class NodeImageWrapper(
     margin: Double = 0.1,
     val threadshold: Int = 4
 ) {
-
-  val ratio = width / height.toDouble()
-  val xCenter = width / 2
-  val yCenter = height / 2
-
-  // assuming square pixels
-  val pixelWidth = if (ratio > 1) {
-    node.position.rangeX / width * ratio
-  }
-  else {
-    node.position.rangeX / width
-  } / (1 - margin)
-
-  val pixelHeight = if (ratio > 1) {
-    node.position.rangeX / height
-  }
-  else {
-    node.position.rangeX / height / ratio
-  } / (1 - margin)
-
-
-  val context = CoordinatesContext(
-      pixelHeight,
-      node.position.midX,
-      node.position.midY,
-      xCenter,
-      yCenter
-  )
+  val viewport = PlanViewport(node.position)
+  val rasterizationContext = RasterizationContext(viewport, width, height)
 
   fun toImage(): BufferedImage {
-    val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-    renderMandelbrot(image)
+    val image = renderMandelbrot()
     renderAreas(image)
     return image
   }
 
-  private fun renderMandelbrot(image: BufferedImage) {
-    if (Math.abs((pixelHeight / pixelWidth) - 1) > 0.001) {
-      throw IllegalStateException("$pixelHeight and $pixelWidth should be very close to each other. Bug?")
-    }
-
-    val raster = image.data as WritableRaster
-
-    (0 until raster.height).forEach { y ->
-      (0 until raster.width).forEach { x ->
-        val (real, img) = ImageCoordinates(x, y, context).toPlan()
-        val iterations = node.metadata.iterationsAt(real, img)
-        val color = computeColor(iterations)
-        raster.setPixel(x, y, color)
-      }
-    }
-
-    image.data = raster
-  }
-
-  private fun computeColor(iterations: Long): IntArray {
-    return when (iterations) {
-      node.metadata.iterationLimit -> IntArray(3) { 255 }
-      else -> IntArray(3) {
-        (iterations * 255 / 2 / node.metadata.iterationLimit).toInt()
-      }
-    }
+  private fun renderMandelbrot(): BufferedImage {
+    val renderer = MandelbrotRenderer(viewport)
+    return renderer
+        .render(
+            width,
+            height,
+            node.metadata.iterationLimit,
+            node.metadata.computeEngine
+        )
   }
 
   private fun renderAreas(image: BufferedImage) {
@@ -95,18 +50,16 @@ class NodeImageWrapper(
         EDGE -> Color(0, 100, 200)
       }
 
-      val topLeft = toRaster(node.position.minX, node.position.maxY)
-      val bottomRight = toRaster(node.position.maxX, node.position.minY)
-      val x = topLeft.first
-      val y = topLeft.second
-      val width = bottomRight.first - topLeft.first
-      val height = bottomRight.second - topLeft.second
+      val topLeft = rasterizationContext.convert(node.position.topLeft)
+      val bottomRight = rasterizationContext.convert(node.position.bottomRight)
+      val width = bottomRight.x - topLeft.x
+      val height = bottomRight.y - topLeft.y
 
       if (width > threadshold) {
-        paintAsRegular(g, color, x, y, width, height)
+        paintAsRegular(g, color, topLeft.x, topLeft.y, width, height)
       }
       else {
-        paintAsUnavailable(g, x, y, width, height)
+        paintAsUnavailable(g, topLeft.x, topLeft.y, width, height)
       }
     }
   }
@@ -135,19 +88,5 @@ class NodeImageWrapper(
     val color = Color(128, 128, 128)
     g.paint = color.withAlpha(0.5)
     g.fillRect(x, y, width, height)
-  }
-
-  /**
-   * pixelWidth * (x - xCenter) + node.position.midX
-   * pw * (x-xc) + nmx = real
-   * pw * (x-xc) = real - nmx
-   * (x-xc) = (real - nmx) / pw
-   * x = ((real - nmx) / pw) + xc
-   */
-  private fun toRaster(real: Double, img: Double): Pair<Int, Int> {
-    return Pair(
-        (((real - node.position.midX) / pixelWidth) + xCenter).toInt(),
-        (yCenter - ((img - node.position.midY) / pixelHeight)).toInt()
-    )
   }
 }

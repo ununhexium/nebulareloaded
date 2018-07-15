@@ -27,3 +27,10 @@ Abstract more elements behind interfaces.
 Much faster to develop, the time spent on tests is also much longer.
 
 Refactoring immediately instead of later.
+
+Reaching a working prototype is soooooo much faster :D, even with distractions
+
+Testing coordinates conversion before using them is much more efficient.
+
+Coordinates conversion are *not that easy*.
+
