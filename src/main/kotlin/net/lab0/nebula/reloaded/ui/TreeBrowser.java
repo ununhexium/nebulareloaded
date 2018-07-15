@@ -1,10 +1,12 @@
 package net.lab0.nebula.reloaded.ui;
 
+import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine;
+import net.lab0.nebula.reloaded.mandelbrot.ComputeEnginesKt;
+
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class TreeBrowser {
   private JLabel realValue;
@@ -19,13 +21,14 @@ public class TreeBrowser {
   private JPanel mainPanel;
   private MandelbrotPanel mandelbrotPanel;
   private JButton viewportReset;
+  private JPanel computePanel;
+  private JComboBox<ComputeEngine> computeEngineComboBox;
 
   public TreeBrowser() {
-    viewportReset.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        mandelbrotPanel.resetViewport();
-      }
+    viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
+    computeEngineComboBox.addItemListener(e -> {
+      ComputeEngine item = (ComputeEngine) e.getItem();
+      mandelbrotPanel.setComputeEngine(item);
     });
   }
 
@@ -38,6 +41,13 @@ public class TreeBrowser {
    */
   public void finishSetup() {
     linkMandelbrotPanel();
+    populateComputeEngineList();
+  }
+
+  private void populateComputeEngineList() {
+    ComputeEnginesKt.getComputeEngines().forEach(
+        it -> computeEngineComboBox.addItem(it)
+    );
   }
 
   private void linkMandelbrotPanel() {

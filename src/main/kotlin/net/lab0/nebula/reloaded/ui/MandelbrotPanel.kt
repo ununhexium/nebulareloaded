@@ -4,7 +4,8 @@ import net.lab0.nebula.reloaded.image.ImageCoordinates
 import net.lab0.nebula.reloaded.image.MandelbrotRenderer
 import net.lab0.nebula.reloaded.image.PlanViewport
 import net.lab0.nebula.reloaded.image.RasterizationContext
-import net.lab0.nebula.reloaded.mandelbrot.ComputeOptim2
+import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine
+import net.lab0.nebula.reloaded.mandelbrot.MaxParallelStreamOptim2
 import org.slf4j.LoggerFactory
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -19,12 +20,12 @@ import javax.swing.JPanel
 
 class MandelbrotPanel : JPanel() {
 
-     var viewport = createDefaultViewport()
+    var viewport = createDefaultViewport()
         private set
 
-    private val compute = ComputeOptim2()
+    private var computeEngine: ComputeEngine = MaxParallelStreamOptim2
 
-    private val iterationLimit = 64L
+    private val iterationLimit = 512L
 
     lateinit var realValueLabel: JLabel
     lateinit var imgValueLabel: JLabel
@@ -85,7 +86,7 @@ class MandelbrotPanel : JPanel() {
             this.width,
             this.height,
             iterationLimit,
-            compute
+            computeEngine
         )
         synchronized(lastRenderingRef) {
             lastRenderingRef.set(image)
@@ -121,6 +122,15 @@ class MandelbrotPanel : JPanel() {
     fun zoom(factor: Double) {
         viewport = viewport.zoom(factor)
         asyncUpdateMandelbrotRendering()
+    }
+
+    fun setComputeEngine(computeEngine: ComputeEngine) {
+        log.debug("Switching compute engine to $computeEngine")
+        object : Thread() {
+            override fun run() {
+                this@MandelbrotPanel.computeEngine = computeEngine
+            }
+        }.start()
     }
 
     companion object {

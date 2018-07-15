@@ -4,9 +4,9 @@ package net.lab0.nebula.reloaded.mandelbrot;
  * Same as <code>computeIterationsCountReference()</code> with an optimization to test if inside or outside every 2
  * iterations.
  */
-public class ComputeOptim2 implements Compute {
+public class ComputeEngineOptim2 implements ComputeEngine {
   @Override
-  public long iterationsAt(double real, double img, long maxIter) {
+  public long iterationsAt(double real, double img, long iterationLimit) {
     double realsqr = real * real;
     double imgsqr = img * img;
 
@@ -17,7 +17,7 @@ public class ComputeOptim2 implements Compute {
 
     long iter = 0;
     while (
-        (iter < maxIter)
+        (iter < iterationLimit)
         & // NOSONAR this is an intended optimisation. TODO check this is still faster
         ((realsqr + imgsqr) < 4.0d)
         ) {
@@ -33,5 +33,14 @@ public class ComputeOptim2 implements Compute {
     }
 
     return iter;
+  }
+
+  @Override
+  public long[] iterationsAt(double[] real, double[] img, long iterationLimit) {
+    long[] iterations = new long[real.length];
+    for (int i = 0; i < real.length; ++i) {
+      iterations[i] = iterationsAt(real[i], img[i], iterationLimit);
+    }
+    return iterations;
   }
 }
