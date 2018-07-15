@@ -19,7 +19,7 @@ import javax.swing.JPanel
 
 class MandelbrotPanel : JPanel() {
 
-    var viewport = createDefaultViewport()
+     var viewport = createDefaultViewport()
         private set
 
     private val compute = ComputeOptim2()
@@ -92,14 +92,6 @@ class MandelbrotPanel : JPanel() {
         }
     }
 
-    internal fun setxValueLabel(xValueLabel: JLabel) {
-        this.xValueLabel = xValueLabel
-    }
-
-    internal fun setyValueLabel(yValueLabel: JLabel) {
-        this.yValueLabel = yValueLabel
-    }
-
     fun setSelectionBox(startToEnd: Pair<MouseEvent, MouseEvent>?) {
         this.selectionBox = startToEnd
     }
@@ -124,6 +116,11 @@ class MandelbrotPanel : JPanel() {
         return PlanViewport(
             Pair(-2, 2), Pair(-2, 2)
         )
+    }
+
+    fun zoom(factor: Double) {
+        viewport = viewport.zoom(factor)
+        asyncUpdateMandelbrotRendering()
     }
 
     companion object {

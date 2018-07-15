@@ -112,7 +112,7 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
     }
 
     override fun mouseWheelMoved(e: MouseWheelEvent) {
-
+        panel.zoom(Math.exp(-e.preciseWheelRotation / 2))
     }
 
     override fun componentMoved(e: ComponentEvent?) {

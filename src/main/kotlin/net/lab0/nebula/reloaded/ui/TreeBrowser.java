@@ -54,6 +54,7 @@ public class TreeBrowser {
 
     mandelbrotPanel.addMouseListener(mandelbrotActions);
     mandelbrotPanel.addMouseMotionListener(mandelbrotActions);
+    mandelbrotPanel.addMouseWheelListener(mandelbrotActions);
     mandelbrotPanel.addKeyListener(mandelbrotActions);
     mandelbrotPanel.addComponentListener(mandelbrotActions);
   }
