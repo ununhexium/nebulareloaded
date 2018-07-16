@@ -241,7 +241,7 @@ class MandelbrotPanel : JPanel() {
     Thread {
       tree.getNodesBreadthFirst {
         it.needsCompute()
-      }.forEach {
+      }.parallelStream().forEach {
         it.compute()
       }
       EventQueue.invokeLater {
