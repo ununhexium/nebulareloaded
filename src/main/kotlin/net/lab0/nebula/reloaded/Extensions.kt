@@ -1,7 +1,6 @@
 package net.lab0.nebula.reloaded
 
 
-
 fun <A : Number, B : Number> Pair<A, B>.toDouble() =
     Pair(this.first.toDouble(), this.second.toDouble())
 

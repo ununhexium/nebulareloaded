@@ -12,91 +12,91 @@ import kotlin.system.measureNanoTime
 class MandelbrotRenderer(
     val viewport: PlanViewport
 ) {
-    companion object {
-        private val log: Logger by lazy {
-            LoggerFactory
-                .getLogger(this::class.java.name)
-        }
-
-        val BLACK = IntArray(3) { 0 }
-        val GRAY = IntArray(3) { 128 }
+  companion object {
+    private val log: Logger by lazy {
+      LoggerFactory
+          .getLogger(this::class.java.name)
     }
 
-    fun render(
-        width: Int,
-        height: Int,
-        iterationLimit: Long,
-        computeEngine: ComputeEngine
-    ): BufferedImage {
-        log.debug("Computing with $computeEngine")
+    val BLACK = IntArray(3) { 0 }
+    val GRAY = IntArray(3) { 128 }
+  }
 
-        val start = System.nanoTime()
+  fun render(
+      width: Int,
+      height: Int,
+      iterationLimit: Long,
+      computeEngine: ComputeEngine
+  ): BufferedImage {
+    log.debug("Computing with $computeEngine")
 
-        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-        val context = RasterizationContext(viewport, width, height)
-        val raster = image.data as WritableRaster
+    val start = System.nanoTime()
 
-        val reals = DoubleArray(raster.height * raster.width)
-        val imgs = DoubleArray(raster.height * raster.width)
+    val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    val context = RasterizationContext(viewport, width, height)
+    val raster = image.data as WritableRaster
 
-        val prepareTime = measureNanoTime {
-            prepare(raster, context, reals, imgs)
-        }
+    val reals = DoubleArray(raster.height * raster.width)
+    val imgs = DoubleArray(raster.height * raster.width)
 
-        val iterationsRef = AtomicReference<LongArray>()
-        val computeTime = measureNanoTime {
-            iterationsRef
-                .set(computeEngine.iterationsAt(reals, imgs, iterationLimit))
-        }
+    val prepareTime = measureNanoTime {
+      prepare(raster, context, reals, imgs)
+    }
 
-        val finishTime = measureNanoTime {
-            val iterations = iterationsRef.get()
-            iterations.mapIndexed { index, value ->
-                val color = computeColor(value, iterationLimit)
-                raster.setPixel(
-                    index % raster.width,
-                    index / raster.width,
-                    color
-                )
-            }
-        }
+    val iterationsRef = AtomicReference<LongArray>()
+    val computeTime = measureNanoTime {
+      iterationsRef
+          .set(computeEngine.iterationsAt(reals, imgs, iterationLimit))
+    }
 
-        image.data = raster
-
-        val end = System.nanoTime()
-
-        fun Long.toMillis() = this / 1_000_000
-
-        log.debug(
-            "Computation took ${(end - start).toMillis()}. " +
-                "Prepare=${prepareTime.toMillis()}, " +
-                "compute=${computeTime.toMillis()}, " +
-                "finish=${finishTime.toMillis()}"
+    val finishTime = measureNanoTime {
+      val iterations = iterationsRef.get()
+      iterations.mapIndexed { index, value ->
+        val color = computeColor(value, iterationLimit)
+        raster.setPixel(
+            index % raster.width,
+            index / raster.width,
+            color
         )
-        return image
+      }
     }
 
-    private fun prepare(
-        raster: WritableRaster,
-        context: RasterizationContext,
-        reals: DoubleArray,
-        imgs: DoubleArray
-    ) {
-        (0 until raster.height).forEach { y ->
-            (0 until raster.width).forEach { x ->
-                val plan = context.convert(ImageCoordinates(x, y))
-                reals[y * raster.width + x] = plan.real
-                imgs[y * raster.width + x] = plan.img
-            }
-        }
-    }
+    image.data = raster
 
-    private inline fun computeColor(
-        iterations: Long,
-        iterationLimit: Long
-    ): IntArray {
-        val scaled = iterations * 255 / iterationLimit
-        return if (scaled == 255L) BLACK else IntArray(3) { scaled.toInt() }
+    val end = System.nanoTime()
+
+    fun Long.toMillis() = this / 1_000_000
+
+    log.debug(
+        "Computation took ${(end - start).toMillis()}. " +
+            "Prepare=${prepareTime.toMillis()}, " +
+            "compute=${computeTime.toMillis()}, " +
+            "finish=${finishTime.toMillis()}"
+    )
+    return image
+  }
+
+  private fun prepare(
+      raster: WritableRaster,
+      context: RasterizationContext,
+      reals: DoubleArray,
+      imgs: DoubleArray
+  ) {
+    (0 until raster.height).forEach { y ->
+      (0 until raster.width).forEach { x ->
+        val plan = context.convert(ImageCoordinates(x, y))
+        reals[y * raster.width + x] = plan.real
+        imgs[y * raster.width + x] = plan.img
+      }
     }
+  }
+
+  private inline fun computeColor(
+      iterations: Long,
+      iterationLimit: Long
+  ): IntArray {
+    val scaled = iterations * 255 / iterationLimit
+    return if (scaled == 255L) BLACK else IntArray(3) { scaled.toInt() }
+  }
 }
 

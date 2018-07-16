@@ -1,6 +1,7 @@
 package net.lab0.nebula.reloaded.tree
 
-import net.lab0.nebula.reloaded.mandelbrot.Optim2
+
+import net.lab0.nebula.reloaded.mandelbrot.Engines
 import net.lab0.nebula.reloaded.tree.NodePosition.BOTTOM_LEFT
 import net.lab0.nebula.reloaded.tree.NodePosition.BOTTOM_RIGHT
 import net.lab0.nebula.reloaded.tree.NodePosition.ROOT
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test
 class TreeNodeTest {
 
   companion object {
-    val metadata = MetaData(128, 8, Optim2)
+    val metadata = MetaData(128, 8, Engines.Optim2)
 
     fun defaultMandelbrotArea() =
         TreeNode(-2 to 2, -2 to 2, metadata)

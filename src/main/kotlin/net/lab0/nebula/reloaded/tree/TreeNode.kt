@@ -125,19 +125,22 @@ class TreeNode(
   }
 
   /**
+   * @param depthFilter Continue going deeper if this filter is true
    * @param filter Default to accepting all the nodes
    */
   fun getNodesBreadthFirst(
+      depthFilter: (self: TreeNode) -> Boolean = { true },
       filter: (self: TreeNode) -> Boolean = { true }
   ): List<TreeNode> {
     val collector = ArrayList<TreeNode>()
     if (filter(this)) collector.add(this)
-    getNodesBreadthFirst(collector, filter)
+    if (depthFilter(this)) getNodesBreadthFirst(collector, depthFilter, filter)
     return collector
   }
 
   private fun getNodesBreadthFirst(
       collector: MutableList<TreeNode>,
+      depthFilter: (self: TreeNode) -> Boolean,
       filter: (self: TreeNode) -> Boolean
   ) {
     if (hasChildren()) {
@@ -145,7 +148,9 @@ class TreeNode(
         if (filter(it)) collector.add(it)
       }
       children!!.forEach {
-        it.getNodesBreadthFirst(collector, filter)
+        if (depthFilter(it)) {
+          it.getNodesBreadthFirst(collector, depthFilter, filter)
+        }
       }
     }
   }

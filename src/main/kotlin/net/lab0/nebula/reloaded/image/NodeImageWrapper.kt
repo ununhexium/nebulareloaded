@@ -44,7 +44,7 @@ class NodeImageWrapper(
     val g = image.graphics as Graphics2D
     nodes.forEach { node ->
       val color = when (node.payload.status) {
-        UNDEFINED -> Color(255, 255, 255)
+        UNDEFINED -> Color(128, 128, 128)
         OUTSIDE -> Color(0, 128, 0)
         INSIDE -> Color(200, 100, 0)
         EDGE -> Color(0, 100, 200)

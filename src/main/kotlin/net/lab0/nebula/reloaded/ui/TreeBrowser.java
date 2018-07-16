@@ -1,14 +1,24 @@
 package net.lab0.nebula.reloaded.ui;
 
 import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine;
-import net.lab0.nebula.reloaded.mandelbrot.ComputeEnginesKt;
+import net.lab0.nebula.reloaded.mandelbrot.Engines;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingWorker;
 
 public class TreeBrowser {
+
+  private static final Logger log = LoggerFactory.getLogger(TreeBrowser.class);
+
+
   private JLabel realValue;
   private JLabel realLabel;
   private JLabel imgLabel;
@@ -23,12 +33,52 @@ public class TreeBrowser {
   private JButton viewportReset;
   private JPanel computePanel;
   private JComboBox<ComputeEngine> computeEngineComboBox;
+  private JTabbedPane tabs;
+  private JCheckBox drawFractal;
+  private JSpinner iterationLimit;
+  private JCheckBox drawNodes;
+  private JButton moreNodesButton;
+  private JButton refreshButton;
+  private SurfaceIndicator surfaceIndicator;
 
   public TreeBrowser() {
     viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
     computeEngineComboBox.addItemListener(e -> {
       ComputeEngine item = (ComputeEngine) e.getItem();
       mandelbrotPanel.setComputeEngine(item);
+    });
+    drawFractal.addActionListener(e -> {
+      mandelbrotPanel.setShowFractal(drawFractal.isSelected());
+    });
+    iterationLimit.addChangeListener(e -> {
+      mandelbrotPanel.setIterationLimit(((Number) iterationLimit.getValue()).longValue());
+    });
+    drawNodes.addActionListener(e -> {
+      mandelbrotPanel.setShowTree(drawNodes.isSelected());
+    });
+    moreNodesButton.addActionListener(e -> {
+      mandelbrotPanel.computeTreeOnce();
+    });
+    refreshButton.addActionListener(e -> {
+      new SwingWorker<Void,Void>(){
+        private InEdgeOutUndef surfaces;
+        @Override
+        protected Void doInBackground()
+        throws Exception {
+          surfaces = mandelbrotPanel.getInEdgeOutSurfaces();
+          return null;
+        }
+
+        @Override
+        protected void done() {
+          log.debug("New surfaces are " + surfaces);
+          surfaceIndicator.setEdge(surfaces.getEdge());
+          surfaceIndicator.setInside(surfaces.getInside());
+          surfaceIndicator.setOutside(surfaces.getOutside());
+          surfaceIndicator.setUndefined(surfaces.getUndef());
+          surfaceIndicator.repaint();
+        }
+      }.execute();
     });
   }
 
@@ -42,10 +92,23 @@ public class TreeBrowser {
   public void finishSetup() {
     linkMandelbrotPanel();
     populateComputeEngineList();
+    setTabsNames();
+    initIterations();
+  }
+
+  private void initIterations() {
+    int limit = 128;
+    mandelbrotPanel.setIterationLimit(limit);
+    iterationLimit.setValue(limit);
+  }
+
+  private void setTabsNames() {
+    tabs.setTitleAt(0, "Control");
+    tabs.setTitleAt(1, "Compute");
   }
 
   private void populateComputeEngineList() {
-    ComputeEnginesKt.getComputeEngines().forEach(
+    Engines.INSTANCE.getComputeEngines().forEach(
         it -> computeEngineComboBox.addItem(it)
     );
   }
@@ -67,5 +130,9 @@ public class TreeBrowser {
     mandelbrotPanel.addMouseWheelListener(mandelbrotActions);
     mandelbrotPanel.addKeyListener(mandelbrotActions);
     mandelbrotPanel.addComponentListener(mandelbrotActions);
+  }
+
+  private void createUIComponents() {
+
   }
 }

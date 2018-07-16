@@ -27,6 +27,9 @@ interface Rectangle {
   val height
     get() = maxY - minY
 
+  val surface
+    get() = width * height
+
   val xRange
     get() = minX to maxX
 
@@ -53,10 +56,6 @@ interface Rectangle {
         listOf(maxY)
   }
 
-
-  val yMinMidMax
-    get() = listOf(minY, midY, maxY)
-
   val topLeft
     get() = PlanCoordinates(minX, maxY)
 
@@ -68,5 +67,23 @@ interface Rectangle {
 
   val bottomRight
     get() = PlanCoordinates(maxX, minY)
+
+  val corners
+    get() = listOf(
+        topLeft, topRight, bottomLeft, bottomRight
+    )
+
+  /**
+   * @return `true` if the point is inside this rectangle
+   */
+  fun contains(coordinates: PlanCoordinates): Boolean {
+    with(coordinates) {
+      return real >= minX && real < maxX && img >= minY && img < maxY
+    }
+  }
+
+  fun overlaps(other: Rectangle) =
+      other.corners.any { this.contains(it) } ||
+          this.corners.any { other.contains(it) }
 }
 
