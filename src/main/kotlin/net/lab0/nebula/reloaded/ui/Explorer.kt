@@ -6,8 +6,6 @@ import javax.swing.JFrame
 import javax.swing.UIManager
 
 
-
-
 class Explorer {
     companion object {
         internal val log: Logger by lazy {
@@ -26,9 +24,7 @@ fun main(args: Array<String>) {
 
     try {
         // Set cross-platform Java L&F (also called "Metal")
-        UIManager.setLookAndFeel(
-            UIManager.getCrossPlatformLookAndFeelClassName()
-        )
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     }
     catch (e: Exception) {
         // handle exception... or not
