@@ -80,7 +80,7 @@ class MandelbrotPanel : JPanel() {
       }
     }
 
-    val tooSmallRatio = 16
+    val tooSmallRatio = 32
 
     fun TreeNode.isTooSmall() =
         this.position.width < viewport.width / tooSmallRatio &&
