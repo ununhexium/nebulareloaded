@@ -1,8 +1,6 @@
 package net.lab0.nebula.reloaded.ui
 
-import net.lab0.nebula.reloaded.image.ImageCoordinates
 import net.lab0.nebula.reloaded.image.MandelbrotRenderer
-import net.lab0.nebula.reloaded.image.PlanViewport
 import net.lab0.nebula.reloaded.image.RasterizationContext
 import net.lab0.nebula.reloaded.image.withAlpha
 import net.lab0.nebula.reloaded.mandelbrot.ComputeContext
@@ -11,8 +9,6 @@ import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.OUTSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.UNDEFINED
-import net.lab0.nebula.reloaded.tree.Rectangle
-import net.lab0.nebula.reloaded.tree.RectangleImpl
 import net.lab0.nebula.reloaded.tree.TreeNode
 import org.slf4j.LoggerFactory
 import java.awt.Color
@@ -26,8 +22,6 @@ import javax.swing.JLabel
 
 class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeContext>) :
     FractalPanel() {
-  var viewport = createDefaultViewport()
-    private set
 
   private var iterationLimit = 512L
 
@@ -116,15 +110,6 @@ class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeCont
     }
   }
 
-  private fun getActualViewport(): Rectangle {
-    val rasterizationContext = getRasterizationContext()
-    val topLeft = rasterizationContext.convertImageToPlan(0, 0)
-    val bottomRight = rasterizationContext.convertImageToPlan(width, height)
-    return RectangleImpl(
-        topLeft.real to bottomRight.real, bottomRight.img to topLeft.img
-    )
-  }
-
   private fun renderAreas(
       g: Graphics2D,
       nodes: List<TreeNode>
@@ -148,14 +133,6 @@ class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeCont
     }
   }
 
-  private fun getRasterizationContext(): RasterizationContext {
-    return RasterizationContext(
-        viewport,
-        this.width,
-        this.height
-    )
-  }
-
   private fun paintAsRegular(
       g: Graphics2D,
       color: Color,
@@ -168,15 +145,6 @@ class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeCont
     g.fillRect(x + 1, y + 1, width - 2, height - 2)
     g.paint = color.withAlpha(0.5)
     g.drawRect(x, y, width - 1, height - 1)
-  }
-
-  /**
-   * Adds a flag to tell that the image has to be updated.
-   */
-  override fun asyncUpdateRendering() {
-    if (drawFractal || drawTree) {
-      triggerRefresh()
-    }
   }
 
   override fun doRendering() {
@@ -202,34 +170,6 @@ class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeCont
 
   fun setSelectionBox(startToEnd: Pair<MouseEvent, MouseEvent>?) {
     this.selectionBox = startToEnd
-  }
-
-  fun moveViewport(movement: Pair<MouseEvent, MouseEvent>) {
-    val context = RasterizationContext(viewport, width, height)
-    val from = ImageCoordinates(movement.first.x, movement.first.y)
-    val to = ImageCoordinates(movement.second.x, movement.second.y)
-
-    val oldPosition = context.convert(from)
-    val newPosition = context.convert(to)
-    viewport = viewport.translate(oldPosition.minus(newPosition))
-    repaint()
-    asyncUpdateRendering()
-  }
-
-  fun resetViewport() {
-    viewport = createDefaultViewport()
-    asyncUpdateRendering()
-  }
-
-  private fun createDefaultViewport(): PlanViewport {
-    return PlanViewport(
-        Pair(-2, 2), Pair(-2, 2)
-    )
-  }
-
-  fun zoom(factor: Double) {
-    viewport = viewport.zoom(factor)
-    asyncUpdateRendering()
   }
 
   fun setComputeEngine(computeEngine: ComputeEngine) {
