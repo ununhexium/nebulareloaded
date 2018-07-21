@@ -1,6 +1,6 @@
 package net.lab0.nebula.reloaded.image
 
-import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine
+import net.lab0.nebula.reloaded.ui.RenderingContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.image.BufferedImage
@@ -10,7 +10,7 @@ import kotlin.system.measureNanoTime
 
 
 class MandelbrotRenderer(
-    val viewport: PlanViewport
+    val context: RenderingContext
 ) {
   companion object {
     private val log: Logger by lazy {
@@ -22,58 +22,55 @@ class MandelbrotRenderer(
     val GRAY = IntArray(3) { 128 }
   }
 
-  fun render(
-      width: Int,
-      height: Int,
-      iterationLimit: Long,
-      computeEngine: ComputeEngine
-  ): BufferedImage {
-    log.debug("Computing with $computeEngine")
+  fun render() {
+    with(context) {
+      log.debug("Computing with $computeEngine")
 
-    val start = System.nanoTime()
+      val start = System.nanoTime()
 
-    val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-    val context = RasterizationContext(viewport, width, height)
-    val raster = image.data as WritableRaster
+      val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+      val context = RasterizationContext(context.viewport, width, height)
+      val raster = image.data as WritableRaster
 
-    val reals = DoubleArray(raster.height * raster.width)
-    val imgs = DoubleArray(raster.height * raster.width)
+      val reals = DoubleArray(raster.height * raster.width)
+      val imgs = DoubleArray(raster.height * raster.width)
 
-    val prepareTime = measureNanoTime {
-      prepare(raster, context, reals, imgs)
-    }
-
-    val iterationsRef = AtomicReference<LongArray>()
-    val computeTime = measureNanoTime {
-      iterationsRef
-          .set(computeEngine.iterationsAt(reals, imgs, iterationLimit))
-    }
-
-    val finishTime = measureNanoTime {
-      val iterations = iterationsRef.get()
-      iterations.mapIndexed { index, value ->
-        val color = computeColor(value, iterationLimit)
-        raster.setPixel(
-            index % raster.width,
-            index / raster.width,
-            color
-        )
+      val prepareTime = measureNanoTime {
+        prepare(raster, context, reals, imgs)
       }
+
+      val iterationsRef = AtomicReference<LongArray>()
+      val computeTime = measureNanoTime {
+        iterationsRef
+            .set(computeEngine.iterationsAt(reals, imgs, iterationLimit))
+      }
+
+      val finishTime = measureNanoTime {
+        val iterations = iterationsRef.get()
+        iterations.mapIndexed { index, value ->
+          val color = computeColor(value, iterationLimit)
+          raster.setPixel(
+              index % raster.width,
+              index / raster.width,
+              color
+          )
+        }
+      }
+
+      image.data = raster
+      rendering = image
+
+      val end = System.nanoTime()
+
+      fun Long.toMillis() = this / 1_000_000
+
+      log.debug(
+          "Computation took ${(end - start).toMillis()}. " +
+              "Prepare=${prepareTime.toMillis()}, " +
+              "compute=${computeTime.toMillis()}, " +
+              "finish=${finishTime.toMillis()}"
+      )
     }
-
-    image.data = raster
-
-    val end = System.nanoTime()
-
-    fun Long.toMillis() = this / 1_000_000
-
-    log.debug(
-        "Computation took ${(end - start).toMillis()}. " +
-            "Prepare=${prepareTime.toMillis()}, " +
-            "compute=${computeTime.toMillis()}, " +
-            "finish=${finishTime.toMillis()}"
-    )
-    return image
   }
 
   private fun prepare(

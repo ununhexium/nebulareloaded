@@ -5,9 +5,8 @@ import net.lab0.nebula.reloaded.image.MandelbrotRenderer
 import net.lab0.nebula.reloaded.image.PlanViewport
 import net.lab0.nebula.reloaded.image.RasterizationContext
 import net.lab0.nebula.reloaded.image.withAlpha
+import net.lab0.nebula.reloaded.mandelbrot.ComputeContext
 import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine
-import net.lab0.nebula.reloaded.mandelbrot.Engines
-import net.lab0.nebula.reloaded.tree.MetaData
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.OUTSIDE
@@ -22,7 +21,6 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.event.MouseEvent
 import java.awt.geom.AffineTransform
-import java.awt.image.BufferedImage
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
@@ -33,12 +31,7 @@ class MandelbrotPanel : JPanel() {
   var viewport = createDefaultViewport()
     private set
 
-  private var computeEngine: ComputeEngine = Engines.MaxParallelStreamOptim2
-  private var tree = TreeNode(
-      -2 to 2,
-      -2 to 2,
-      MetaData(512, 8, Engines.Default)
-  )
+  private var computeContext = ComputeContext()
 
   private var iterationLimit = 512L
 
@@ -53,8 +46,7 @@ class MandelbrotPanel : JPanel() {
 
   private var selectionBox: Pair<MouseEvent, MouseEvent>? = null
 
-
-  private val lastRenderingRef = AtomicReference<BufferedImage>()
+  private val lastRenderingRef = AtomicReference<RenderingContext>()
   /**
    * Event store to tell that an image update event has been received.
    */
@@ -77,30 +69,71 @@ class MandelbrotPanel : JPanel() {
   override fun paintComponent(graphics: Graphics) {
     super.paintComponent(graphics)
     val g = graphics as Graphics2D
+    val rasterizationContext = getRasterizationContext()
+
     synchronized(lastRenderingRef) {
-      if (drawFractal && lastRenderingRef.get() != null) {
-        g.drawRenderedImage(lastRenderingRef.get(), AffineTransform())
-      }
+      paintLatestFractalRendering(rasterizationContext, g)
     }
 
+    if (drawTree) {
+      paintLatestTree(g)
+    }
+  }
+
+  private fun paintLatestTree(g: Graphics2D) {
     val tooSmallRatio = 32
+    val actualViewport = getActualViewport()
 
     fun TreeNode.isTooSmall() =
-        this.position.width < viewport.width / tooSmallRatio &&
-            this.position.height < viewport.height / tooSmallRatio
+        this.position.width < actualViewport.width / tooSmallRatio &&
+            this.position.height < actualViewport.height / tooSmallRatio
 
-    if (drawTree) {
-      val actualViewport = getActualViewport()
+    val toRender = computeContext.tree.getNodesBreadthFirst(
+        depthFilter = {
+          !it.isTooSmall() &&
+              it.position.overlaps(actualViewport)
+        },
+        filter = {
+          it.position.overlaps(actualViewport) &&
+              (!it.hasChildren() || it.isTooSmall())
+        }
+    )
+    log.debug("Found ${toRender.size} nodes to render")
+    renderAreas(g, toRender)
+  }
 
-      val toRender = tree.getNodesBreadthFirst(
-          depthFilter = { !it.isTooSmall() },
-          filter = {
-            it.position.overlaps(actualViewport) &&
-                (!it.hasChildren() || it.isTooSmall())
-          }
+  private fun paintLatestFractalRendering(
+      rasterizationContext: RasterizationContext,
+      g: Graphics2D
+  ) {
+    if (drawFractal && lastRenderingRef.get() != null) {
+      /**
+       * compute the position difference between the last rendering and
+       * the current rendering. This is necessary as the repaint may happen
+       * between the moment the image moved and the image is recomputed.
+       *
+       * If we are in such a situation, repaint the part of the image that
+       * can be updated while waiting for the next image to be rendered.
+       */
+
+      val lastViewport = lastRenderingRef.get().viewport
+      val previousCenter = rasterizationContext.convert(lastViewport.center)
+      val currentCenter = rasterizationContext.convert(viewport.center)
+
+      val xOffset = previousCenter.x - currentCenter.x
+      val yOffset = previousCenter.y - currentCenter.y
+
+      log.debug("Drawing offset: $xOffset;$yOffset")
+
+      val affineTransform = AffineTransform(
+          1.0, // no X scaling
+          0.0, // no Y shearing
+          0.0, // no X shearing
+          1.0, // no Y scaling
+          xOffset.toDouble(),
+          yOffset.toDouble()
       )
-      log.debug("Found ${toRender.size} nodes to render")
-      renderAreas(g, toRender)
+      g.drawRenderedImage(lastRenderingRef.get().rendering, affineTransform)
     }
   }
 
@@ -168,20 +201,23 @@ class MandelbrotPanel : JPanel() {
   }
 
   internal fun updateMandelbrotRendering() {
+    log.debug("Update rendering")
     if (this.width == 0 || this.height == 0) {
       // skip because can't create an image
       return
     }
 
-    val renderer = MandelbrotRenderer(viewport)
-    val image = renderer.render(
-        this.width,
-        this.height,
+    val renderingContext = RenderingContext(
+        viewport,
+        width,
+        height,
         iterationLimit,
-        computeEngine
+        computeContext.computeEngine
     )
+    val renderer = MandelbrotRenderer(renderingContext)
+    renderer.render()
     synchronized(lastRenderingRef) {
-      lastRenderingRef.set(image)
+      lastRenderingRef.set(renderingContext)
     }
   }
 
@@ -197,6 +233,7 @@ class MandelbrotPanel : JPanel() {
     val oldPosition = context.convert(from)
     val newPosition = context.convert(to)
     viewport = viewport.translate(oldPosition.minus(newPosition))
+    repaint()
     asyncUpdateMandelbrotRendering()
   }
 
@@ -220,7 +257,9 @@ class MandelbrotPanel : JPanel() {
     log.debug("Switching compute engine to $computeEngine")
     object : Thread() {
       override fun run() {
-        this@MandelbrotPanel.computeEngine = computeEngine
+        this@MandelbrotPanel.computeContext =
+            this@MandelbrotPanel.computeContext
+                .changeComputeEngine(computeEngine)
       }
     }.start()
   }
@@ -255,12 +294,12 @@ class MandelbrotPanel : JPanel() {
     asyncUpdateMandelbrotRendering()
   }
 
-  fun getIterationLimit()  = this.iterationLimit
+  fun getIterationLimit() = this.iterationLimit
 
   // TODO extract nodes computing logic somewhere else
   fun computeTreeOnce() {
     Thread {
-      tree.getNodesBreadthFirst {
+      computeContext.tree.getNodesBreadthFirst {
         it.needsCompute()
       }.parallelStream().forEach {
         it.compute()
@@ -272,7 +311,7 @@ class MandelbrotPanel : JPanel() {
   }
 
   fun getInEdgeOutSurfaces(): InEdgeOutUndef {
-    val surfaces = tree.getNodesBreadthFirst {
+    val surfaces = computeContext.tree.getNodesBreadthFirst {
       !it.hasChildren()
     }.groupBy {
       it.payload.status

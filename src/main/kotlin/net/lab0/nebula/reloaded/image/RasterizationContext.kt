@@ -1,7 +1,9 @@
 package net.lab0.nebula.reloaded.image
 
+import net.lab0.nebula.reloaded.tree.Rectangle
+
 class RasterizationContext(
-    val viewport: PlanViewport,
+    val viewport: Rectangle,
     val width: Int,
     val height: Int
 ) {

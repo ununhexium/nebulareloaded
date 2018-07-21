@@ -1,6 +1,5 @@
 package net.lab0.nebula.reloaded.tree
 
-import com.google.common.collect.Lists
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.UNDEFINED
 import net.lab0.tools.delegated.NullableSetOnce
@@ -98,10 +97,9 @@ class TreeNode(
   }
 
   fun shouldSplit(): Boolean {
-    val pointsSample = getPointsSample()
-    val iterations = pointsSample.map {
-      metadata.computeEngine.iterationsAt(it.x, it.y, metadata.iterationLimit)
-    }
+    val (reals, imgs) = getPointsSample()
+    val iterations = metadata.computeEngine
+        .iterationsAt(reals, imgs, metadata.iterationLimit)
 
     this.payload.minIterations = iterations.min()!!
     this.payload.maxIterations = iterations.max()!!
@@ -109,13 +107,22 @@ class TreeNode(
     return payload.status == EDGE
   }
 
-  private fun getPointsSample(): List<Point> {
-    return Lists.cartesianProduct(
-        position.listOfX(metadata.edgeSplits),
-        position.listOfY(metadata.edgeSplits)
-    ).map {
-      Point(it[0], it[1])
+  private fun getPointsSample(): Pair<DoubleArray, DoubleArray> {
+    val xs = position.listOfX(metadata.edgeSplits)
+    val ys = position.listOfY(metadata.edgeSplits)
+
+    val reals = DoubleArray(xs.size * ys.size)
+    val imgs = DoubleArray(xs.size * ys.size)
+
+    ys.forEachIndexed { iy, y ->
+      xs.forEachIndexed { ix, x ->
+        val index = iy * xs.size + ix
+        reals[index] = x
+        imgs[index] = y
+      }
     }
+
+    return reals to imgs
   }
 
   fun needsCompute() = this.payload.status === UNDEFINED

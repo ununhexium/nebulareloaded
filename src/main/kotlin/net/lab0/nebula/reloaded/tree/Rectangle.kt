@@ -68,6 +68,9 @@ interface Rectangle {
   val bottomRight
     get() = PlanCoordinates(maxX, minY)
 
+  val center
+    get() = PlanCoordinates(midX, midY)
+
   val corners
     get() = listOf(
         topLeft, topRight, bottomLeft, bottomRight

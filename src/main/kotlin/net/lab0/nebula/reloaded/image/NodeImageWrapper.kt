@@ -5,6 +5,7 @@ import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.OUTSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.UNDEFINED
 import net.lab0.nebula.reloaded.tree.TreeNode
+import net.lab0.nebula.reloaded.ui.RenderingContext
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
@@ -29,14 +30,16 @@ class NodeImageWrapper(
   }
 
   private fun renderMandelbrot(): BufferedImage {
-    val renderer = MandelbrotRenderer(viewport)
-    return renderer
-        .render(
-            width,
-            height,
-            node.metadata.iterationLimit,
-            node.metadata.computeEngine
-        )
+    val renderingContext = RenderingContext(
+        viewport,
+        width,
+        height,
+        node.metadata.iterationLimit,
+        node.metadata.computeEngine
+    )
+    val renderer = MandelbrotRenderer(renderingContext)
+    renderer.render()
+    return renderer.context.rendering
   }
 
   private fun renderAreas(image: BufferedImage) {
