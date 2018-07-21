@@ -12,6 +12,8 @@ import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.OUTSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.UNDEFINED
+import net.lab0.nebula.reloaded.tree.Rectangle
+import net.lab0.nebula.reloaded.tree.RectangleImpl
 import net.lab0.nebula.reloaded.tree.TreeNode
 import org.slf4j.LoggerFactory
 import java.awt.Color
@@ -87,10 +89,12 @@ class MandelbrotPanel : JPanel() {
             this.position.height < viewport.height / tooSmallRatio
 
     if (drawTree) {
+      val actualViewport = getActualViewport()
+
       val toRender = tree.getNodesBreadthFirst(
           depthFilter = { !it.isTooSmall() },
           filter = {
-            it.position.overlaps(viewport) &&
+            it.position.overlaps(actualViewport) &&
                 (!it.hasChildren() || it.isTooSmall())
           }
       )
@@ -99,15 +103,21 @@ class MandelbrotPanel : JPanel() {
     }
   }
 
+  private fun getActualViewport(): Rectangle {
+    val rasterizationContext = getRasterizationContext()
+    val topLeft = rasterizationContext.convertImageToPlan(0, 0)
+    val bottomRight = rasterizationContext.convertImageToPlan(width, height)
+    return RectangleImpl(
+        topLeft.real to bottomRight.real, bottomRight.img to topLeft.img
+    )
+  }
+
   private fun renderAreas(
       g: Graphics2D,
       nodes: List<TreeNode>
   ) {
-    val rasterizationContext = RasterizationContext(
-        viewport,
-        this.width,
-        this.height
-    )
+    val rasterizationContext = getRasterizationContext()
+
     nodes.forEach { node ->
       val color = when (node.payload.status) {
         UNDEFINED -> Color(255, 255, 255)
@@ -123,6 +133,14 @@ class MandelbrotPanel : JPanel() {
 
       paintAsRegular(g, color, topLeft.x, topLeft.y, width, height)
     }
+  }
+
+  private fun getRasterizationContext(): RasterizationContext {
+    return RasterizationContext(
+        viewport,
+        this.width,
+        this.height
+    )
   }
 
   private fun paintAsRegular(
@@ -143,7 +161,7 @@ class MandelbrotPanel : JPanel() {
    * Adds a flag to tell that the image has to be updated.
    */
   fun asyncUpdateMandelbrotRendering() {
-    if (drawFractal) {
+    if (drawFractal || drawTree) {
       blockingQueue.offer(TOKEN)
     }
   }

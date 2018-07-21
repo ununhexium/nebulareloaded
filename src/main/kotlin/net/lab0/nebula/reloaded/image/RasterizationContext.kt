@@ -22,17 +22,22 @@ class RasterizationContext(
 
   fun convert(coordinates: PlanCoordinates) =
       with(coordinates) {
-        ImageCoordinates(
-            (((real - viewport.midX) / pixelSide) + xCenter).toInt(),
-            (yCenter - ((img - viewport.midY) / pixelSide)).toInt()
-        )
+        convertPlanToImage(real, img)
       }
 
+  fun convertPlanToImage(real: Double, img: Double) =
+      ImageCoordinates(
+          (((real - viewport.midX) / pixelSide) + xCenter).toInt(),
+          (yCenter - ((img - viewport.midY) / pixelSide)).toInt()
+      )
+
+
   fun convert(coordinates: ImageCoordinates) =
-      with(coordinates) {
-        PlanCoordinates(
-            pixelSide * (x - xCenter) + viewport.midX,
-            -pixelSide * (y - yCenter) + viewport.midY
-        )
-      }
+      with(coordinates) { convertImageToPlan(x, y) }
+
+  fun convertImageToPlan(x: Int, y: Int) =
+      PlanCoordinates(
+          pixelSide * (x - xCenter) + viewport.midX,
+          -pixelSide * (y - yCenter) + viewport.midY
+      )
 }
