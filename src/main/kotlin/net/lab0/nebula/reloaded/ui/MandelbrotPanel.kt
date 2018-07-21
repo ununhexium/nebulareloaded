@@ -44,6 +44,7 @@ class MandelbrotPanel : JPanel() {
 
   lateinit var realValueLabel: JLabel
   lateinit var imgValueLabel: JLabel
+  lateinit var iterationsValueLabel: JLabel
   lateinit var xValueLabel: JLabel
   lateinit var yValueLabel: JLabel
 
@@ -253,6 +254,8 @@ class MandelbrotPanel : JPanel() {
     log.debug("Set iteration limit to $limit")
     asyncUpdateMandelbrotRendering()
   }
+
+  fun getIterationLimit()  = this.iterationLimit
 
   // TODO extract nodes computing logic somewhere else
   fun computeTreeOnce() {

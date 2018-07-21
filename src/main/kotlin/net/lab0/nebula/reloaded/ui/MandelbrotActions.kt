@@ -1,7 +1,7 @@
 package net.lab0.nebula.reloaded.ui
 
-import net.lab0.nebula.reloaded.image.ImageCoordinates
 import net.lab0.nebula.reloaded.image.RasterizationContext
+import net.lab0.nebula.reloaded.mandelbrot.Engines.Default
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.event.ComponentEvent
@@ -29,6 +29,8 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
       LoggerFactory
           .getLogger(this::class.java.name)
     }
+
+    private val computeEngine = Default
   }
 
   private var updatePositionLabelsOnMove = true
@@ -101,14 +103,14 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
         panel.width,
         panel.height
     )
-    val imageCoordinates = ImageCoordinates(e.x, e.y)
-    val planCoordinates = context.convert(imageCoordinates)
+    val planCoordinates = context.convertImageToPlan(e.x, e.y)
 
     panel.realValueLabel.text = planCoordinates.real.toString()
     panel.imgValueLabel.text = planCoordinates.img.toString()
+    panel.iterationsValueLabel.text = computeEngine.iterationsAt(planCoordinates.real, planCoordinates.img, panel.getIterationLimit()).toString()
 
-    panel.xValueLabel.text = imageCoordinates.x.toString()
-    panel.yValueLabel.text = imageCoordinates.y.toString()
+    panel.xValueLabel.text = e.x.toString()
+    panel.yValueLabel.text = e.y.toString()
   }
 
   override fun mouseWheelMoved(e: MouseWheelEvent) {

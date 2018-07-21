@@ -40,6 +40,7 @@ public class TreeBrowser {
   private JButton moreNodesButton;
   private JButton refreshButton;
   private SurfaceIndicator surfaceIndicator;
+  private JLabel iterationsValue;
 
   public TreeBrowser() {
     viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
@@ -120,6 +121,8 @@ public class TreeBrowser {
      */
     mandelbrotPanel.setRealValueLabel(realValue);
     mandelbrotPanel.setImgValueLabel(imgValue);
+    mandelbrotPanel.setIterationsValueLabel(iterationsValue);
+
     mandelbrotPanel.setXValueLabel(xValue);
     mandelbrotPanel.setYValueLabel(yValue);
 
