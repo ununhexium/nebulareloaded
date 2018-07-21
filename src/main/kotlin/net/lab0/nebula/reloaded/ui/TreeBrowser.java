@@ -1,5 +1,6 @@
 package net.lab0.nebula.reloaded.ui;
 
+import net.lab0.nebula.reloaded.mandelbrot.ComputeContext;
 import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine;
 import net.lab0.nebula.reloaded.mandelbrot.Engines;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingWorker;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TreeBrowser {
 
@@ -20,12 +22,8 @@ public class TreeBrowser {
 
 
   private JLabel realValue;
-  private JLabel realLabel;
-  private JLabel imgLabel;
   private JLabel imgValue;
-  private JLabel xLabel;
   private JLabel xValue;
-  private JLabel yLabel;
   private JLabel yValue;
   private JPanel controlPanel;
   private JPanel mainPanel;
@@ -136,6 +134,8 @@ public class TreeBrowser {
   }
 
   private void createUIComponents() {
-
+    ComputeContext computeContext = new ComputeContext();
+    AtomicReference<ComputeContext> computeContextRef = new AtomicReference<>(computeContext);
+    mandelbrotPanel = new MandelbrotPanel(computeContextRef);
   }
 }

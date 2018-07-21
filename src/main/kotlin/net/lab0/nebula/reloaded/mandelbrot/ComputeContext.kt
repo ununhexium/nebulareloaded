@@ -10,7 +10,7 @@ class ComputeContext private constructor(
     val tree: TreeNode
 ) {
 
-  constructor(
+  @JvmOverloads constructor(
       computeEngine: ComputeEngine = Engines.MaxParallelStreamOptim2,
       explorationArea: Rectangle = RectangleImpl(
           -2 to 2,

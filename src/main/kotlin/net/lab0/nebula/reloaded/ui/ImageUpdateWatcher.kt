@@ -9,7 +9,7 @@ import java.util.concurrent.BlockingQueue
  * Task in charge of watching for image update events and executing them.
  */
 class ImageUpdateWatcher(
-    private val panel: MandelbrotPanel,
+    private val panel: FractalPanel,
     private val queue: BlockingQueue<Any>
 ) : Runnable {
 
@@ -27,7 +27,7 @@ class ImageUpdateWatcher(
       try {
         log.debug("Waiting for an image refresh event")
         queue.take()
-        panel.updateMandelbrotRendering()
+        panel.doRendering()
         EventQueue.invokeAndWait {
           panel.repaint()
         }

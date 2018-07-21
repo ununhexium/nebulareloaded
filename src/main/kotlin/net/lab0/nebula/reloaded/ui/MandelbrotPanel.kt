@@ -21,17 +21,13 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.event.MouseEvent
 import java.awt.geom.AffineTransform
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.JLabel
-import javax.swing.JPanel
 
-class MandelbrotPanel : JPanel() {
+class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeContext>) :
+    FractalPanel() {
   var viewport = createDefaultViewport()
     private set
-
-  private var computeContext = ComputeContext()
 
   private var iterationLimit = 512L
 
@@ -47,24 +43,7 @@ class MandelbrotPanel : JPanel() {
   private var selectionBox: Pair<MouseEvent, MouseEvent>? = null
 
   private val lastRenderingRef = AtomicReference<RenderingContext>()
-  /**
-   * Event store to tell that an image update event has been received.
-   */
-  private val blockingQueue = ArrayBlockingQueue<Any>(1)
-  /**
-   * Holder for a single thread: the one is charge of checking that an image update request has been received.
-   */
-  private val imageUpdateWatcher = Executors.newSingleThreadExecutor()
 
-  init {
-    asyncUpdateMandelbrotRendering()
-    imageUpdateWatcher.execute(ImageUpdateWatcher(this, blockingQueue))
-    /*
-     * We only want to notify.
-     * If a value was already present, then notifying again will not change anything.
-     */
-    blockingQueue.offer(TOKEN) // NOSONAR
-  }
 
   override fun paintComponent(graphics: Graphics) {
     super.paintComponent(graphics)
@@ -88,7 +67,7 @@ class MandelbrotPanel : JPanel() {
         this.position.width < actualViewport.width / tooSmallRatio &&
             this.position.height < actualViewport.height / tooSmallRatio
 
-    val toRender = computeContext.tree.getNodesBreadthFirst(
+    val toRender = computeContextRef.get().tree.getNodesBreadthFirst(
         depthFilter = {
           !it.isTooSmall() &&
               it.position.overlaps(actualViewport)
@@ -194,13 +173,13 @@ class MandelbrotPanel : JPanel() {
   /**
    * Adds a flag to tell that the image has to be updated.
    */
-  fun asyncUpdateMandelbrotRendering() {
+  override fun asyncUpdateRendering() {
     if (drawFractal || drawTree) {
-      blockingQueue.offer(TOKEN)
+      triggerRefresh()
     }
   }
 
-  internal fun updateMandelbrotRendering() {
+  override fun doRendering() {
     log.debug("Update rendering")
     if (this.width == 0 || this.height == 0) {
       // skip because can't create an image
@@ -212,7 +191,7 @@ class MandelbrotPanel : JPanel() {
         width,
         height,
         iterationLimit,
-        computeContext.computeEngine
+        computeContextRef.get().computeEngine
     )
     val renderer = MandelbrotRenderer(renderingContext)
     renderer.render()
@@ -225,7 +204,7 @@ class MandelbrotPanel : JPanel() {
     this.selectionBox = startToEnd
   }
 
-  fun moveImage(movement: Pair<MouseEvent, MouseEvent>) {
+  fun moveViewport(movement: Pair<MouseEvent, MouseEvent>) {
     val context = RasterizationContext(viewport, width, height)
     val from = ImageCoordinates(movement.first.x, movement.first.y)
     val to = ImageCoordinates(movement.second.x, movement.second.y)
@@ -234,12 +213,12 @@ class MandelbrotPanel : JPanel() {
     val newPosition = context.convert(to)
     viewport = viewport.translate(oldPosition.minus(newPosition))
     repaint()
-    asyncUpdateMandelbrotRendering()
+    asyncUpdateRendering()
   }
 
   fun resetViewport() {
     viewport = createDefaultViewport()
-    asyncUpdateMandelbrotRendering()
+    asyncUpdateRendering()
   }
 
   private fun createDefaultViewport(): PlanViewport {
@@ -250,16 +229,17 @@ class MandelbrotPanel : JPanel() {
 
   fun zoom(factor: Double) {
     viewport = viewport.zoom(factor)
-    asyncUpdateMandelbrotRendering()
+    asyncUpdateRendering()
   }
 
   fun setComputeEngine(computeEngine: ComputeEngine) {
     log.debug("Switching compute engine to $computeEngine")
     object : Thread() {
       override fun run() {
-        this@MandelbrotPanel.computeContext =
-            this@MandelbrotPanel.computeContext
+        this@MandelbrotPanel.computeContextRef.set(
+            this@MandelbrotPanel.computeContextRef.get()
                 .changeComputeEngine(computeEngine)
+        )
       }
     }.start()
   }
@@ -267,7 +247,7 @@ class MandelbrotPanel : JPanel() {
   fun setShowFractal(enabled: Boolean) {
     this.drawFractal = enabled
     if (this.drawFractal) {
-      asyncUpdateMandelbrotRendering()
+      asyncUpdateRendering()
     }
     else {
       EventQueue.invokeLater {
@@ -279,7 +259,7 @@ class MandelbrotPanel : JPanel() {
   fun setShowTree(selected: Boolean) {
     this.drawTree = selected
     if (selected) {
-      asyncUpdateMandelbrotRendering()
+      asyncUpdateRendering()
     }
     else {
       EventQueue.invokeLater {
@@ -291,7 +271,7 @@ class MandelbrotPanel : JPanel() {
   fun setIterationLimit(limit: Long) {
     this.iterationLimit = limit
     log.debug("Set iteration limit to $limit")
-    asyncUpdateMandelbrotRendering()
+    asyncUpdateRendering()
   }
 
   fun getIterationLimit() = this.iterationLimit
@@ -299,7 +279,7 @@ class MandelbrotPanel : JPanel() {
   // TODO extract nodes computing logic somewhere else
   fun computeTreeOnce() {
     Thread {
-      computeContext.tree.getNodesBreadthFirst {
+      computeContextRef.get().tree.getNodesBreadthFirst {
         it.needsCompute()
       }.parallelStream().forEach {
         it.compute()
@@ -311,7 +291,7 @@ class MandelbrotPanel : JPanel() {
   }
 
   fun getInEdgeOutSurfaces(): InEdgeOutUndef {
-    val surfaces = computeContext.tree.getNodesBreadthFirst {
+    val surfaces = computeContextRef.get().tree.getNodesBreadthFirst {
       !it.hasChildren()
     }.groupBy {
       it.payload.status
@@ -329,6 +309,5 @@ class MandelbrotPanel : JPanel() {
 
   companion object {
     private val log = LoggerFactory.getLogger(MandelbrotPanel::class.java)
-    private val TOKEN = Object()
   }
 }

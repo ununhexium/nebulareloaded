@@ -84,7 +84,7 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
       panel.setSelectionBox(null)
       val tmpLastMousePosition = lastMousePosition
       if (tmpLastMousePosition != null) {
-        panel.moveImage(tmpLastMousePosition to e)
+        panel.moveViewport(tmpLastMousePosition to e)
       }
       lastMousePosition = e
     }
@@ -123,7 +123,7 @@ class MandelbrotActions(private val panel: MandelbrotPanel) :
 
   override fun componentResized(e: ComponentEvent?) {
     log.debug("Component resized")
-    panel.asyncUpdateMandelbrotRendering()
+    panel.asyncUpdateRendering()
   }
 
   override fun componentHidden(e: ComponentEvent?) {
