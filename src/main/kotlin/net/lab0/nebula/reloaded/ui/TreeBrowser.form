@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="769" height="724"/>
+      <xy x="20" y="20" width="769" height="728"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -184,7 +184,7 @@
                       <text value="More nodes"/>
                     </properties>
                   </component>
-                  <grid id="79641" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="79641" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -210,9 +210,25 @@
                           <text value="Tree"/>
                         </properties>
                       </component>
+                      <component id="16e15" class="javax.swing.JCheckBox" binding="syncCheckbox">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Sync"/>
+                        </properties>
+                      </component>
+                      <component id="8ac88" class="javax.swing.JCheckBox" binding="forceRenderingCheckbox">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Force rendering"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
-                  <grid id="f6f3a" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="f6f3a" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -220,14 +236,6 @@
                     <properties/>
                     <border type="etched" title="Nodes"/>
                     <children>
-                      <component id="ed09b" class="javax.swing.JButton" binding="refreshButton" default-binding="true">
-                        <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                        </constraints>
-                        <properties>
-                          <text value="Refresh"/>
-                        </properties>
-                      </component>
                       <component id="cb723" class="net.lab0.nebula.reloaded.ui.SurfaceIndicator" binding="surfaceIndicator">
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -271,7 +279,7 @@
               </grid>
             </children>
           </tabbedpane>
-          <tabbedpane id="aa341">
+          <tabbedpane id="aa341" binding="renderingsTabs">
             <constraints>
               <splitpane position="right"/>
             </constraints>

@@ -16,6 +16,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.JPanel
+import javax.swing.event.EventListenerList
 
 abstract class FractalPanel(
     val computeContextRef: AtomicReference<MandelbrotComputeContext>
@@ -29,9 +30,21 @@ abstract class FractalPanel(
     }
   }
 
-  var viewport = createDefaultViewport()
-    private set
+  val eventListenersList = EventListenerList()
 
+  var viewport = createDefaultViewport()
+    set(new) {
+      if (new != viewport) {
+        field = new
+        fireViewportUpdated()
+      }
+    }
+
+  private fun fireViewportUpdated() {
+    eventListenersList.getListeners(ViewportListener::class.java).forEach {
+      it.viewportChanged(this, viewport)
+    }
+  }
 
   private var drawFractal = true
 
@@ -159,5 +172,9 @@ abstract class FractalPanel(
         this.repaint()
       }
     }
+  }
+
+  fun addViewportListener(listener: ViewportListener) {
+    eventListenersList.add(ViewportListener::class.java, listener)
   }
 }

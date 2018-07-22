@@ -36,17 +36,25 @@ public class TreeBrowser {
   private JSpinner iterationLimit;
   private JCheckBox drawNodes;
   private JButton moreNodesButton;
-  private JButton refreshButton;
   private SurfaceIndicator surfaceIndicator;
   private JLabel iterationsValue;
   private NebulabrotPanel nebulabrotPanel;
+  private JTabbedPane renderingsTabs;
+  private JCheckBox syncCheckbox;
+  private JCheckBox forceRenderingCheckbox;
 
   // CUSTOM
   private MandelbrotComputeContext context;
   private AtomicReference<MandelbrotComputeContext> computeContextRef;
+  private FractalPanelViewportSynchronizer synchronizer;
 
   public TreeBrowser() {
-    viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
+    viewportReset.addActionListener(
+        e -> {
+          mandelbrotPanel.resetViewport();
+          nebulabrotPanel.resetViewport();
+        }
+    );
     computeEngineComboBox.addItemListener(e -> {
       MandelbrotComputeEngine item = (MandelbrotComputeEngine) e.getItem();
       mandelbrotPanel.setComputeEngine(item);
@@ -70,6 +78,12 @@ public class TreeBrowser {
     );
 
     finishSetup();
+    syncCheckbox.addActionListener(
+        e -> synchronizer.setSynchronize(syncCheckbox.isSelected())
+    );
+    forceRenderingCheckbox.addActionListener(
+        e -> synchronizer.setForceRendering(forceRenderingCheckbox.isSelected())
+    );
   }
 
   private void triggerAreasRefresh() {
@@ -105,7 +119,7 @@ public class TreeBrowser {
    * To be called after the creation of this class to finish linking all the objects.
    */
   public void finishSetup() {
-    linkMandelbrotPanel();
+    linkFractalPanels();
     populateComputeEngineList();
     setTabsNames();
     initIterations();
@@ -132,6 +146,8 @@ public class TreeBrowser {
   private void setTabsNames() {
     tabs.setTitleAt(0, "Control");
     tabs.setTitleAt(1, "Compute");
+    renderingsTabs.setTitleAt(0, "Mandelbrot");
+    renderingsTabs.setTitleAt(1, "Nebulabrot");
   }
 
   private void populateComputeEngineList() {
@@ -140,7 +156,7 @@ public class TreeBrowser {
     );
   }
 
-  private void linkMandelbrotPanel() {
+  private void linkFractalPanels() {
     FractalActions mandelbrotActions = new FractalActions(mandelbrotPanel);
     FractalActions nebulaActions = new FractalActions(nebulabrotPanel);
 
@@ -149,6 +165,15 @@ public class TreeBrowser {
 
     linkActions(nebulaActions, nebulabrotPanel);
     linkActions(mandelbrotActions, mandelbrotPanel);
+
+    synchronizer = new FractalPanelViewportSynchronizer(
+        mandelbrotPanel, nebulabrotPanel
+    );
+    synchronizer.setSynchronize(syncCheckbox.isSelected());
+    synchronizer.setSynchronize(forceRenderingCheckbox.isSelected());
+
+    mandelbrotPanel.addViewportListener(synchronizer);
+    nebulabrotPanel.addViewportListener(synchronizer);
   }
 
   private void linkActions(
