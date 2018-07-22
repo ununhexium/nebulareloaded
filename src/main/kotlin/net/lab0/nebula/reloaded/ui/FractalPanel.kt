@@ -3,14 +3,16 @@ package net.lab0.nebula.reloaded.ui
 import net.lab0.nebula.reloaded.image.ImageCoordinates
 import net.lab0.nebula.reloaded.image.PlanViewport
 import net.lab0.nebula.reloaded.image.RasterizationContext
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.tree.Rectangle
 import net.lab0.nebula.reloaded.tree.RectangleImpl
 import java.awt.event.MouseEvent
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicReference
 import javax.swing.JPanel
 
-abstract class FractalPanel : JPanel() {
+abstract class FractalPanel(val computeContextRef: AtomicReference<MandelbrotComputeContext>) : JPanel() {
   companion object {
     private val TOKEN = Object()
   }

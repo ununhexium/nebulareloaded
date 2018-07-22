@@ -1,11 +1,11 @@
-package net.lab0.nebula.reloaded.mandelbrot
+package net.lab0.nebula.reloaded.compute.mandelbrot
 
 import java.util.stream.IntStream
 
-class StreamComputeEngine(
-    val computeEngine: ComputeEngine,
+class StreamMandelbrotComputeEngine(
+    val computeEngine: MandelbrotComputeEngine,
     private val parallel: Boolean = true
-) : ComputeEngine {
+) : MandelbrotComputeEngine {
   override fun iterationsAt(
       real: Double,
       img: Double,

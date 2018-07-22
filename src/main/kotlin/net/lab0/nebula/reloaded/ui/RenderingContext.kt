@@ -1,6 +1,6 @@
 package net.lab0.nebula.reloaded.ui
 
-import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine
 import net.lab0.nebula.reloaded.tree.Rectangle
 import java.awt.image.BufferedImage
 
@@ -9,7 +9,7 @@ class RenderingContext(
     val width: Int,
     val height:Int,
     val iterationLimit: Long,
-    val computeEngine: ComputeEngine
+    val computeEngine: MandelbrotComputeEngine
 ){
   lateinit var rendering: BufferedImage
 }

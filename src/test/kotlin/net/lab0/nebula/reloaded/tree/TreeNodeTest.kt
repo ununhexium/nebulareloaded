@@ -1,7 +1,7 @@
 package net.lab0.nebula.reloaded.tree
 
 
-import net.lab0.nebula.reloaded.mandelbrot.Engines
+import net.lab0.nebula.reloaded.compute.mandelbrot.Engines
 import net.lab0.nebula.reloaded.tree.NodePosition.BOTTOM_LEFT
 import net.lab0.nebula.reloaded.tree.NodePosition.BOTTOM_RIGHT
 import net.lab0.nebula.reloaded.tree.NodePosition.ROOT

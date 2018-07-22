@@ -1,6 +1,6 @@
 package net.lab0.nebula.reloaded
 
-import net.lab0.nebula.reloaded.mandelbrot.Engines
+import net.lab0.nebula.reloaded.compute.mandelbrot.Engines
 import net.lab0.nebula.reloaded.tree.MetaData
 import net.lab0.nebula.reloaded.tree.TreeNode
 

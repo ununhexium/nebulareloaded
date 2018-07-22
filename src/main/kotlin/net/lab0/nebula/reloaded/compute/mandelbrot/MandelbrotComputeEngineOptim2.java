@@ -1,10 +1,10 @@
-package net.lab0.nebula.reloaded.mandelbrot;
+package net.lab0.nebula.reloaded.compute.mandelbrot;
 
 /**
  * Same as <code>computeIterationsCountReference()</code> with an optimization to test if inside or outside every 2
  * iterations.
  */
-public class ComputeEngineOptim2 implements ComputeEngine {
+public class MandelbrotComputeEngineOptim2 implements MandelbrotComputeEngine {
   @Override
   public long iterationsAt(double real, double img, long iterationLimit) {
     double realsqr = real * real;

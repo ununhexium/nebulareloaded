@@ -1,11 +1,17 @@
 package net.lab0.nebula.reloaded.ui
 
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
-import javax.swing.JPanel
+import java.util.concurrent.atomic.AtomicReference
 
-class NebulabrotPanel : JPanel() {
+class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContext>) :
+    FractalPanel(computeContextRef) {
+
+  override fun doRendering() {
+
+  }
 
   val iterations = Array(0) { LongArray(0) }
 
@@ -14,4 +20,6 @@ class NebulabrotPanel : JPanel() {
     g2d.paint = Color.BLACK
     g2d.fillRect(0, 0, width, height)
   }
+
+
 }

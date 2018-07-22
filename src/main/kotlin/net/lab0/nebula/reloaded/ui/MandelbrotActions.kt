@@ -1,7 +1,7 @@
 package net.lab0.nebula.reloaded.ui
 
 import net.lab0.nebula.reloaded.image.RasterizationContext
-import net.lab0.nebula.reloaded.mandelbrot.Engines.Default
+import net.lab0.nebula.reloaded.compute.mandelbrot.Engines.Default
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.event.ComponentEvent

@@ -1,8 +1,8 @@
 package net.lab0.nebula.reloaded.ui;
 
-import net.lab0.nebula.reloaded.mandelbrot.ComputeContext;
-import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine;
-import net.lab0.nebula.reloaded.mandelbrot.Engines;
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext;
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine;
+import net.lab0.nebula.reloaded.compute.mandelbrot.Engines;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public class TreeBrowser {
   private MandelbrotPanel mandelbrotPanel;
   private JButton viewportReset;
   private JPanel computePanel;
-  private JComboBox<ComputeEngine> computeEngineComboBox;
+  private JComboBox<MandelbrotComputeEngine> computeEngineComboBox;
   private JTabbedPane tabs;
   private JCheckBox drawFractal;
   private JSpinner iterationLimit;
@@ -43,7 +43,7 @@ public class TreeBrowser {
   public TreeBrowser() {
     viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
     computeEngineComboBox.addItemListener(e -> {
-      ComputeEngine item = (ComputeEngine) e.getItem();
+      MandelbrotComputeEngine item = (MandelbrotComputeEngine) e.getItem();
       mandelbrotPanel.setComputeEngine(item);
     });
     drawFractal.addActionListener(e -> {
@@ -134,8 +134,8 @@ public class TreeBrowser {
   }
 
   private void createUIComponents() {
-    ComputeContext computeContext = new ComputeContext();
-    AtomicReference<ComputeContext> computeContextRef = new AtomicReference<>(computeContext);
+    MandelbrotComputeContext computeContext = new MandelbrotComputeContext();
+    AtomicReference<MandelbrotComputeContext> computeContextRef = new AtomicReference<>(computeContext);
     mandelbrotPanel = new MandelbrotPanel(computeContextRef);
   }
 }

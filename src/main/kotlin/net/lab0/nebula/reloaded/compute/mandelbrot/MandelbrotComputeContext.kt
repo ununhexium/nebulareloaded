@@ -1,17 +1,17 @@
-package net.lab0.nebula.reloaded.mandelbrot
+package net.lab0.nebula.reloaded.compute.mandelbrot
 
 import net.lab0.nebula.reloaded.tree.MetaData
 import net.lab0.nebula.reloaded.tree.Rectangle
 import net.lab0.nebula.reloaded.tree.RectangleImpl
 import net.lab0.nebula.reloaded.tree.TreeNode
 
-class ComputeContext private constructor(
-    val computeEngine: ComputeEngine,
+class MandelbrotComputeContext private constructor(
+    val computeEngine: MandelbrotComputeEngine,
     val tree: TreeNode
 ) {
 
   @JvmOverloads constructor(
-      computeEngine: ComputeEngine = Engines.MaxParallelStreamOptim2,
+      computeEngine: MandelbrotComputeEngine = Engines.MaxParallelStreamOptim2,
       explorationArea: Rectangle = RectangleImpl(
           -2 to 2,
           -2 to 2
@@ -26,6 +26,6 @@ class ComputeContext private constructor(
       )
   )
 
-  fun changeComputeEngine(computeEngine: ComputeEngine) =
-      ComputeContext(computeEngine, this.tree)
+  fun changeComputeEngine(computeEngine: MandelbrotComputeEngine) =
+      MandelbrotComputeContext(computeEngine, this.tree)
 }

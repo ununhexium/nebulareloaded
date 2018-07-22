@@ -1,9 +1,9 @@
 package net.lab0.nebula.reloaded.tree
 
-import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine
 
 data class MetaData(
     val iterationLimit: Long,
     val edgeSplits: Int,
-    val computeEngine: ComputeEngine
+    val computeEngine: MandelbrotComputeEngine
 )

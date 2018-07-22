@@ -1,12 +1,12 @@
-package net.lab0.nebula.reloaded.mandelbrot
+package net.lab0.nebula.reloaded.compute.mandelbrot
 
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
-class ThreadComputeEngine(
-    private val computeEngine: ComputeEngine,
+class ThreadMandelbrotComputeEngine(
+    private val computeEngine: MandelbrotComputeEngine,
     private val maxThreadCount: Int = Runtime.getRuntime().availableProcessors()
-) : ComputeEngine {
+) : MandelbrotComputeEngine {
   private val executor = Executors.newFixedThreadPool(maxThreadCount)
 
   init {

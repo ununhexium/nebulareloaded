@@ -1,6 +1,6 @@
-package net.lab0.nebula.reloaded.mandelbrot;
+package net.lab0.nebula.reloaded.compute.mandelbrot;
 
-public interface ComputeEngine {
+public interface MandelbrotComputeEngine {
   /**
    * @param real           The real part coordinate of the point to compute.
    * @param img            The imaginary part coordinate of the point to compute.

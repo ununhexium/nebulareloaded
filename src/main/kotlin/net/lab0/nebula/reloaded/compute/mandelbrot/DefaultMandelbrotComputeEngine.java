@@ -1,9 +1,9 @@
-package net.lab0.nebula.reloaded.mandelbrot;
+package net.lab0.nebula.reloaded.compute.mandelbrot;
 
 /**
  * Reference, simple computation method. CPU implementation.
  */
-public class DefaultComputeEngine implements ComputeEngine {
+public class DefaultMandelbrotComputeEngine implements MandelbrotComputeEngine {
   @Override
   public long iterationsAt(double real, double img, long iterationLimit) {
     double real1 = real;

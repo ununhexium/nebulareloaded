@@ -1,10 +1,10 @@
 package net.lab0.nebula.reloaded.ui
 
+import net.lab0.nebula.reloaded.compute.mandelbrot.ComputeContext
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine
 import net.lab0.nebula.reloaded.image.MandelbrotRenderer
 import net.lab0.nebula.reloaded.image.RasterizationContext
 import net.lab0.nebula.reloaded.image.withAlpha
-import net.lab0.nebula.reloaded.mandelbrot.ComputeContext
-import net.lab0.nebula.reloaded.mandelbrot.ComputeEngine
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.OUTSIDE
@@ -20,8 +20,8 @@ import java.awt.geom.AffineTransform
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.JLabel
 
-class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeContext>) :
-    FractalPanel() {
+class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContext>) :
+    FractalPanel(computeContextRef) {
 
   private var iterationLimit = 512L
 
@@ -172,7 +172,7 @@ class MandelbrotPanel(private val computeContextRef: AtomicReference<ComputeCont
     this.selectionBox = startToEnd
   }
 
-  fun setComputeEngine(computeEngine: ComputeEngine) {
+  fun setComputeEngine(computeEngine: MandelbrotComputeEngine) {
     log.debug("Switching compute engine to $computeEngine")
     object : Thread() {
       override fun run() {
