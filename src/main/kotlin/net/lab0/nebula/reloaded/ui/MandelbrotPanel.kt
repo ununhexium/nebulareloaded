@@ -146,37 +146,6 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     asyncUpdateRendering()
   }
 
-  // TODO extract nodes computing logic somewhere else
-  fun computeTreeOnce() {
-    Thread {
-      computeContextRef.get().tree.getNodesBreadthFirst {
-        it.needsCompute()
-      }.parallelStream().forEach {
-        it.compute()
-      }
-      EventQueue.invokeLater {
-        this@MandelbrotPanel.repaint()
-      }
-    }.start()
-  }
-
-  fun getInEdgeOutSurfaces(): InEdgeOutUndef {
-    val surfaces = computeContextRef.get().tree.getNodesBreadthFirst {
-      !it.hasChildren()
-    }.groupBy {
-      it.payload.status
-    }.mapValues {
-      it.value.map { it.position.surface }.sum()
-    }
-
-    return InEdgeOutUndef(
-        surfaces[INSIDE] ?: 0.0,
-        surfaces[EDGE] ?: 0.0,
-        surfaces[OUTSIDE] ?: 0.0,
-        surfaces[UNDEFINED] ?: 0.0
-    )
-  }
-
   companion object {
     private val log = LoggerFactory.getLogger(MandelbrotPanel::class.java)
   }

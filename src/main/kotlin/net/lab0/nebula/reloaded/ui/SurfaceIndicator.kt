@@ -8,15 +8,14 @@ import javax.swing.JPanel
 class SurfaceIndicator(
     var inside: Double,
     var edge: Double,
-    var outside: Double,
-    var undefined: Double
+    var outside: Double
 ) : JPanel() {
 
-    constructor() : this(1.0, 1.0, 1.0, 1.0)
+    constructor() : this(1.0, 1.0, 1.0)
 
     override fun paintComponent(graphics: Graphics) {
         val g = graphics as Graphics2D
-        val sum = Math.max(inside + edge + outside + undefined, 1.0)
+        val sum = Math.max(inside + edge + outside, 1.0)
         val endInside = width * inside / sum
         val endEdge = width * (inside + edge) / sum
         val endOutside = width * (inside + edge + outside) / sum

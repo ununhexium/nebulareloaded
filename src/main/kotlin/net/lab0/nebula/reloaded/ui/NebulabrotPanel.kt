@@ -51,7 +51,6 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
         },
         filter = {
           it.payload.status != INSIDE &&
-              it.payload.minIterations >= this.minIterations &&
               (!it.hasChildren() || it.tooSmall())
         }
     )

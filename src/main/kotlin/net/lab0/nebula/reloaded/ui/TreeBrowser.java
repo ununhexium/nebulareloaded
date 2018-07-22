@@ -41,48 +41,60 @@ public class TreeBrowser {
   private JLabel iterationsValue;
   private NebulabrotPanel nebulabrotPanel;
 
+  // CUSTOM
+  private MandelbrotComputeContext context;
+  private AtomicReference<MandelbrotComputeContext> computeContextRef;
+
   public TreeBrowser() {
     viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
     computeEngineComboBox.addItemListener(e -> {
       MandelbrotComputeEngine item = (MandelbrotComputeEngine) e.getItem();
       mandelbrotPanel.setComputeEngine(item);
     });
-    drawFractal.addActionListener(e -> {
-      mandelbrotPanel.setShowFractal(drawFractal.isSelected());
-    });
-    iterationLimit.addChangeListener(e -> {
-      mandelbrotPanel.setIterationLimit(((Number) iterationLimit.getValue()).longValue());
-    });
-    drawNodes.addActionListener(e -> {
-      mandelbrotPanel.setShowTree(drawNodes.isSelected());
-    });
-    moreNodesButton.addActionListener(e -> {
-      mandelbrotPanel.computeTreeOnce();
-    });
-    refreshButton.addActionListener(e -> {
-      new SwingWorker<Void, Void>() {
-        private InEdgeOutUndef surfaces;
-
-        @Override
-        protected Void doInBackground()
-        throws Exception {
-          surfaces = mandelbrotPanel.getInEdgeOutSurfaces();
-          return null;
-        }
-
-        @Override
-        protected void done() {
-          log.debug("New surfaces are " + surfaces);
-          surfaceIndicator.setEdge(surfaces.getEdge());
-          surfaceIndicator.setInside(surfaces.getInside());
-          surfaceIndicator.setOutside(surfaces.getOutside());
-          surfaceIndicator.setUndefined(surfaces.getUndef());
-          surfaceIndicator.repaint();
-        }
-      }.execute();
-    });
+    drawFractal.addActionListener(
+        e -> mandelbrotPanel.setShowFractal(drawFractal.isSelected())
+    );
+    iterationLimit.addChangeListener(
+        e -> mandelbrotPanel.setIterationLimit(((Number) iterationLimit.getValue()).longValue())
+    );
+    drawNodes.addActionListener(
+        e -> mandelbrotPanel.setShowTree(drawNodes.isSelected())
+    );
+    moreNodesButton.addActionListener(
+        e -> computeContextRef.get().computeTreeOnce(
+            () -> {
+              triggerAreasRefresh();
+              mandelbrotPanel.asyncUpdateRendering();
+              return null;
+            })
+    );
 
     finishSetup();
+  }
+
+  private void triggerAreasRefresh() {
+    new SwingWorker<Void, Void>() {
+      private InEdgeOutUndef surfaces;
+
+      @Override
+      protected Void doInBackground()
+      throws Exception {
+        surfaces = computeContextRef.get().getInEdgeOutSurfaces();
+        return null;
+      }
+
+      @Override
+      protected void done() {
+        log.debug("New surfaces are " + surfaces);
+        /*
+         * using undef as edge surface as these were the previous edge surfaces.
+         */
+        surfaceIndicator.setEdge(surfaces.getUndef());
+        surfaceIndicator.setInside(surfaces.getInside());
+        surfaceIndicator.setOutside(surfaces.getOutside());
+        surfaceIndicator.repaint();
+      }
+    }.execute();
   }
 
   public JPanel getMainPanel() {
@@ -160,11 +172,9 @@ public class TreeBrowser {
   }
 
   private void createUIComponents() {
-    MandelbrotComputeContext context = new MandelbrotComputeContext();
-    AtomicReference<MandelbrotComputeContext> computeContextRef = new AtomicReference<>(context);
-
+    context = new MandelbrotComputeContext();
+    computeContextRef = new AtomicReference<>(context);
     mandelbrotPanel = new MandelbrotPanel(computeContextRef);
     nebulabrotPanel = new NebulabrotPanel(computeContextRef);
   }
-
 }
