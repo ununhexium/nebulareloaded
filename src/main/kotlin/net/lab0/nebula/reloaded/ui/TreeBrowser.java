@@ -3,6 +3,8 @@ package net.lab0.nebula.reloaded.ui;
 import net.lab0.nebula.reloaded.compute.mandelbrot.Engines;
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext;
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine;
+import net.lab0.nebula.reloaded.image.color.ColorScheme;
+import net.lab0.nebula.reloaded.image.color.ColorSchemes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,7 @@ public class TreeBrowser {
   private JCheckBox syncCheckbox;
   private JCheckBox forceRenderingCheckbox;
   private JSplitPane innerSplit;
+  private JComboBox<ColorScheme> mandelbrotColorSchemeComboBox;
 
   // CUSTOM
   private MandelbrotComputeContext context;
@@ -94,6 +97,13 @@ public class TreeBrowser {
         innerSplit.setDividerLocation(0.9);
       }
     });
+    mandelbrotColorSchemeComboBox.addActionListener(
+        e -> {
+          mandelbrotPanel.setColorScheme(mandelbrotColorSchemeComboBox.getItemAt(
+              mandelbrotColorSchemeComboBox.getSelectedIndex()));
+          mandelbrotPanel.asyncUpdateRendering();
+        }
+    );
   }
 
   private void triggerAreasRefresh() {
@@ -131,10 +141,17 @@ public class TreeBrowser {
   public void finishSetup() {
     linkFractalPanels();
     populateComputeEngineList();
+    populateMandelbrotColorScheme();
     setTabsNames();
     initIterations();
     setDisplayOptions();
     refreshDisplays();
+  }
+
+  private void populateMandelbrotColorScheme() {
+    ColorSchemes.INSTANCE.forEach(
+        it -> mandelbrotColorSchemeComboBox.addItem(it)
+    );
   }
 
   private void refreshDisplays() {

@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="730" height="728"/>
+      <xy x="20" y="20" width="864" height="728"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -278,7 +278,7 @@
               <splitpane position="right"/>
             </constraints>
             <properties>
-              <dividerLocation value="57"/>
+              <dividerLocation value="500"/>
               <enabled value="true"/>
               <oneTouchExpandable value="true"/>
             </properties>
@@ -288,7 +288,9 @@
                 <constraints>
                   <splitpane position="left"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <minimumSize width="500" height="500"/>
+                </properties>
                 <border type="none"/>
                 <children>
                   <grid id="71be1" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -335,7 +337,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="d4525" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="d4525" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -351,6 +353,20 @@
                         </constraints>
                         <properties>
                           <visible value="true"/>
+                        </properties>
+                      </component>
+                      <component id="29d40" class="javax.swing.JComboBox" binding="mandelbrotColorSchemeComboBox">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="f91ae" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Color scheme"/>
                         </properties>
                       </component>
                     </children>

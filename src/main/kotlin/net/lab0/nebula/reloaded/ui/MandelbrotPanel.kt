@@ -3,6 +3,8 @@ package net.lab0.nebula.reloaded.ui
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine
 import net.lab0.nebula.reloaded.image.MandelbrotRenderer
+import net.lab0.nebula.reloaded.image.color.ColorScheme
+import net.lab0.nebula.reloaded.image.color.GrayScale
 import net.lab0.nebula.reloaded.image.withAlpha
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
@@ -20,8 +22,8 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     FractalPanel(computeContextRef) {
 
   private var iterationLimit = 512L
-
   private var drawTree = true
+  var colorScheme: ColorScheme = GrayScale
 
   override fun paintComponent(graphics: Graphics) {
     super.paintComponent(graphics)
@@ -109,7 +111,7 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
         iterationLimit,
         computeContextRef.get().computeEngine
     )
-    val renderer = MandelbrotRenderer(renderingContext)
+    val renderer = MandelbrotRenderer(renderingContext, colorScheme)
     renderer.render()
     synchronized(lastRenderingRef) {
       lastRenderingRef.set(renderingContext)

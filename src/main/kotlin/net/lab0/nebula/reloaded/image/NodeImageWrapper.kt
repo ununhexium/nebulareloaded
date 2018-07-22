@@ -1,5 +1,6 @@
 package net.lab0.nebula.reloaded.image
 
+import net.lab0.nebula.reloaded.image.color.GrayScale
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.OUTSIDE
@@ -37,7 +38,7 @@ class NodeImageWrapper(
         node.metadata.iterationLimit,
         node.metadata.computeEngine
     )
-    val renderer = MandelbrotRenderer(renderingContext)
+    val renderer = MandelbrotRenderer(renderingContext, GrayScale)
     renderer.render()
     return renderer.context.rendering
   }
