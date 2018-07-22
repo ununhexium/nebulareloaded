@@ -1,5 +1,6 @@
 package net.lab0.nebula.reloaded.ui
 
+import com.google.common.math.IntMath
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.compute.nebulabrot.NebulabrotComputeEngine
 import net.lab0.nebula.reloaded.compute.nebulabrot.ParallelStreamNebulabrotComputeEngine
@@ -29,14 +30,16 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
   /**
    * Complex plan points per pixel
    */
-  val resolution = 0.001
+  val resolutionIndex = 10
   val pointsPerSide = 16
-  var minIterations = 100
-  var maxIterations = 10000
+  var minIterations: Long = 100
+  var maxIterations: Long = 10000
 
   override fun doRendering() {
 
-    log.debug("Rendering Nebulabrot")
+    val resolution = getResolution()
+    log
+        .debug("Rendering Nebulabrot with min=$minIterations, max=$maxIterations, pointsPerSide=$pointsPerSide, resolution=$resolution")
 
     val computeContext = computeContextRef.get()
 
@@ -46,8 +49,7 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
 
     val nodes = computeContextRef.get().tree.getNodesBreadthFirst(
         depthFilter = {
-          it.payload.status != INSIDE &&
-              it.payload.maxIterations > this.minIterations
+          it.payload.status != INSIDE && !it.tooSmall()
         },
         filter = {
           it.payload.status != INSIDE &&
@@ -78,7 +80,7 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     }
 
     val renderingContext = RenderingContext(
-        viewport, width, height, 512, computeContext.computeEngine
+        viewport, width, height, maxIterations, computeContext.computeEngine
     )
     computeEngine.compute(points, renderingContext, minIterations)
     lastRenderingRef.set(renderingContext)
@@ -94,5 +96,7 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     }
   }
 
-
+  fun getResolution(): Double {
+    return 1.0 / IntMath.pow(2, resolutionIndex)
+  }
 }

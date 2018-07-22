@@ -64,13 +64,16 @@ dependencies {
 
   compile("net.lab0.kotlin.more:morekotlin:0.1.2")
 
+  compile("org.funktionale:funktionale-currying:1.2")
+
   compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
   compile("org.jetbrains.kotlin:kotlin-reflect")
 
-  compile("org.funktionale:funktionale-currying:1.2")
+  compile ("org.slf4j:slf4j-api:1.7.25")
+  compile("org.slf4j:slf4j-jdk14:1.7.25")
 
-  compile("org.springframework:spring-core")
-  compile("org.springframework.shell:spring-shell-starter:$springShellVersion")
+//  compile("org.springframework:spring-core")
+//  compile("org.springframework.shell:spring-shell-starter:$springShellVersion")
 
   testImplementation("org.assertj:assertj-core:$assertJVersion")
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")

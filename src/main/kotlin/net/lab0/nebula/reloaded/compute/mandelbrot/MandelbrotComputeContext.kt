@@ -21,7 +21,7 @@ class MandelbrotComputeContext private constructor(
           -2 to 2,
           -2 to 2
       ),
-      iterationLimit: Long = 512,
+      iterationLimit: Long = 4096,
       edgeSplit: Int = 8
   ) : this(
       computeEngine,

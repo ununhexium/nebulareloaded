@@ -8,7 +8,7 @@ interface NebulabrotComputeEngine {
   fun compute(
       points: Sequence<ComplexPoint>,
       context: RenderingContext,
-      lowIterationLimit: Int
+      lowIterationLimit: Long
   )
 
   /**

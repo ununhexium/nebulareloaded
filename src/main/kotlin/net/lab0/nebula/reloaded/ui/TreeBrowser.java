@@ -49,6 +49,8 @@ public class TreeBrowser {
   private JCheckBox forceRenderingCheckbox;
   private JSplitPane innerSplit;
   private JComboBox<ColorScheme> mandelbrotColorSchemeComboBox;
+  private JSpinner nebulaMinimumIteration;
+  private JSpinner nebulaMaximumIteration;
 
   // CUSTOM
   private MandelbrotComputeContext context;
@@ -104,6 +106,18 @@ public class TreeBrowser {
           mandelbrotPanel.asyncUpdateRendering();
         }
     );
+    nebulaMinimumIteration.addChangeListener(
+        e -> {
+          nebulabrotPanel.setMinIterations((Integer) nebulaMinimumIteration.getValue());
+          nebulabrotPanel.asyncUpdateRendering();
+        }
+    );
+    nebulaMaximumIteration.addChangeListener(
+        e -> {
+          nebulabrotPanel.setMaxIterations((Integer) nebulaMaximumIteration.getValue());
+          nebulabrotPanel.asyncUpdateRendering();
+        }
+    );
   }
 
   private void triggerAreasRefresh() {
@@ -140,12 +154,16 @@ public class TreeBrowser {
    */
   public void finishSetup() {
     linkFractalPanels();
-    populateComputeEngineList();
-    populateMandelbrotColorScheme();
+    populate();
     setTabsNames();
     initIterations();
     setDisplayOptions();
     refreshDisplays();
+  }
+
+  private void populate() {
+    populateComputeEngineList();
+    populateMandelbrotColorScheme();
   }
 
   private void populateMandelbrotColorScheme() {
@@ -165,9 +183,15 @@ public class TreeBrowser {
   }
 
   private void initIterations() {
-    int limit = 128;
-    mandelbrotPanel.setIterationLimit(limit);
-    iterationLimit.setValue(limit);
+    iterationLimit.setValue(128);
+    mandelbrotPanel.setIterationLimit((Integer) iterationLimit.getValue());
+
+    nebulaMinimumIteration.setValue(100);
+    nebulabrotPanel.setMinIterations((Integer) nebulaMinimumIteration.getValue());
+
+    nebulaMaximumIteration.setValue(4096);
+    nebulabrotPanel.setMaxIterations((Integer) nebulaMaximumIteration.getValue());
+
   }
 
   private void setTabsNames() {

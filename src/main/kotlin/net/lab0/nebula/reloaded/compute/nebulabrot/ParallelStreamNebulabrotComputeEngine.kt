@@ -25,7 +25,7 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
   override fun compute(
       points: Sequence<ComplexPoint>,
       context: RenderingContext,
-      lowIterationLimit: Int
+      lowIterationLimit: Long
   ) {
 
     val rasterizationContext = RasterizationContext(
