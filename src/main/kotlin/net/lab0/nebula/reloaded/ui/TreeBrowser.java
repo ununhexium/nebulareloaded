@@ -12,8 +12,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingWorker;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TreeBrowser {
@@ -42,6 +45,7 @@ public class TreeBrowser {
   private JTabbedPane renderingsTabs;
   private JCheckBox syncCheckbox;
   private JCheckBox forceRenderingCheckbox;
+  private JSplitPane innerSplit;
 
   // CUSTOM
   private MandelbrotComputeContext context;
@@ -84,6 +88,12 @@ public class TreeBrowser {
     forceRenderingCheckbox.addActionListener(
         e -> synchronizer.setForceRendering(forceRenderingCheckbox.isSelected())
     );
+    innerSplit.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        innerSplit.setDividerLocation(0.9);
+      }
+    });
   }
 
   private void triggerAreasRefresh() {
