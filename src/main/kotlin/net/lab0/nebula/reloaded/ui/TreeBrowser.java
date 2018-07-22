@@ -123,18 +123,15 @@ public class TreeBrowser {
   }
 
   private void linkMandelbrotPanel() {
-    /*
-     * That's ugly...
-     * Deal with it until this is converted to Java.
-     */
-    mandelbrotPanel.setRealValueLabel(realValue);
-    mandelbrotPanel.setImgValueLabel(imgValue);
-    mandelbrotPanel.setIterationsValueLabel(iterationsValue);
-
-    mandelbrotPanel.setXValueLabel(xValue);
-    mandelbrotPanel.setYValueLabel(yValue);
 
     MandelbrotActions mandelbrotActions = new MandelbrotActions(mandelbrotPanel);
+
+    mandelbrotActions.setRealValueLabel(realValue);
+    mandelbrotActions.setImgValueLabel(imgValue);
+    mandelbrotActions.setIterationsValueLabel(iterationsValue);
+
+    mandelbrotActions.setXValueLabel(xValue);
+    mandelbrotActions.setYValueLabel(yValue);
 
     mandelbrotPanel.addMouseListener(mandelbrotActions);
     mandelbrotPanel.addMouseMotionListener(mandelbrotActions);

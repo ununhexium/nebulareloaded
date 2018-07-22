@@ -9,8 +9,8 @@ import java.awt.event.MouseWheelListener
 /**
  * Event management logic for the mandelbrot set viewer class.
  */
-class MandelbrotActions(private val panel: MandelbrotPanel) :
-    FractalActions(panel),
+class MandelbrotActions(private val mandelbrotPanel: MandelbrotPanel) :
+    FractalActions(mandelbrotPanel),
     MouseListener,
     MouseMotionListener,
     KeyListener,

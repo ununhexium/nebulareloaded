@@ -13,6 +13,7 @@ import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
+import javax.swing.JLabel
 
 open class FractalActions(private val panel: MandelbrotPanel) :
     MouseListener,
@@ -34,6 +35,13 @@ open class FractalActions(private val panel: MandelbrotPanel) :
 
   private var lastMousePosition: MouseEvent? = null
   private var press: MouseEvent? = null
+
+  // references to the main panel
+  lateinit var realValueLabel: JLabel
+  lateinit var imgValueLabel: JLabel
+  lateinit var iterationsValueLabel: JLabel
+  lateinit var xValueLabel: JLabel
+  lateinit var yValueLabel: JLabel
 
   override fun mouseReleased(e: MouseEvent) {
     panel.asyncUpdateRendering()
@@ -110,16 +118,16 @@ open class FractalActions(private val panel: MandelbrotPanel) :
     )
     val planCoordinates = context.convertImageToPlan(e.x, e.y)
 
-    panel.realValueLabel.text = planCoordinates.real.toString()
-    panel.imgValueLabel.text = planCoordinates.img.toString()
-    panel.iterationsValueLabel.text = computeEngine
+    realValueLabel.text = planCoordinates.real.toString()
+    imgValueLabel.text = planCoordinates.img.toString()
+    iterationsValueLabel.text = computeEngine
         .iterationsAt(
             planCoordinates.real,
             planCoordinates.img,
             panel.getIterationLimit()
         ).toString()
 
-    panel.xValueLabel.text = e.x.toString()
-    panel.yValueLabel.text = e.y.toString()
+    xValueLabel.text = e.x.toString()
+    yValueLabel.text = e.y.toString()
   }
 }

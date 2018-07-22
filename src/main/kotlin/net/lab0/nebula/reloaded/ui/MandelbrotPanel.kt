@@ -25,12 +25,6 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
 
   private var iterationLimit = 512L
 
-  lateinit var realValueLabel: JLabel
-  lateinit var imgValueLabel: JLabel
-  lateinit var iterationsValueLabel: JLabel
-  lateinit var xValueLabel: JLabel
-  lateinit var yValueLabel: JLabel
-
   private var drawFractal = true
   private var drawTree = true
 
