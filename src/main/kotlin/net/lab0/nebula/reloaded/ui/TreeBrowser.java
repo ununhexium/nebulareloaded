@@ -51,6 +51,8 @@ public class TreeBrowser {
   private JComboBox<ColorScheme> mandelbrotColorSchemeComboBox;
   private JSpinner nebulaMinimumIteration;
   private JSpinner nebulaMaximumIteration;
+  private JSpinner resolutionSelector;
+  private JLabel resolutionLabel;
 
   // CUSTOM
   private MandelbrotComputeContext context;
@@ -115,6 +117,12 @@ public class TreeBrowser {
     nebulaMaximumIteration.addChangeListener(
         e -> {
           nebulabrotPanel.setMaxIterations((Integer) nebulaMaximumIteration.getValue());
+          nebulabrotPanel.asyncUpdateRendering();
+        }
+    );
+    resolutionSelector.addChangeListener(
+        e -> {
+          updateResolutionIndex((Integer) resolutionSelector.getValue());
           nebulabrotPanel.asyncUpdateRendering();
         }
     );
@@ -192,6 +200,13 @@ public class TreeBrowser {
     nebulaMaximumIteration.setValue(4096);
     nebulabrotPanel.setMaxIterations((Integer) nebulaMaximumIteration.getValue());
 
+    resolutionSelector.setValue(10);
+    updateResolutionIndex(10);
+  }
+
+  private void updateResolutionIndex(int resolutionIndex) {
+    nebulabrotPanel.setResolutionIndex(resolutionIndex);
+    resolutionLabel.setText(String.valueOf(1.0 / Math.pow(2, resolutionIndex)));
   }
 
   private void setTabsNames() {

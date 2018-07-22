@@ -1,3 +1,5 @@
+import com.github.rholder.gradle.task.OneJar
+import groovy.xml.dom.DOMCategory.attributes
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val assertJVersion = "3.10.0"
@@ -15,23 +17,24 @@ buildscript {
     jcenter()
   }
   dependencies {
-    val kotlinVersion = "1.2.51"
     classpath("org.junit.platform:junit-platform-gradle-plugin:+")
+    classpath("com.github.rholder:gradle-one-jar:1.0.4")
   }
 }
 
 plugins {
-  val kotlinVersion = "1.2.51"
+  val kotlinVersion = "1.2.41"
   idea
   java
   id("org.jetbrains.kotlin.jvm") version kotlinVersion
-  id("org.springframework.boot") version "2.0.3.RELEASE"
-  id("io.spring.dependency-management") version "1.0.5.RELEASE"
-  id ("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
+//  id("org.springframework.boot") version "2.0.3.RELEASE"
+//  id("io.spring.dependency-management") version "1.0.5.RELEASE"
+  id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
 }
 
 apply {
   plugin("kotlin-spring")
+  plugin("gradle-one-jar")
 }
 
 java {
@@ -69,7 +72,7 @@ dependencies {
   compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
   compile("org.jetbrains.kotlin:kotlin-reflect")
 
-  compile ("org.slf4j:slf4j-api:1.7.25")
+  compile("org.slf4j:slf4j-api:1.7.25")
   compile("org.slf4j:slf4j-jdk14:1.7.25")
 
 //  compile("org.springframework:spring-core")
@@ -85,23 +88,15 @@ tasks.withType<Test> {
   useJUnitPlatform()
 }
 
-tasks.withType<Jar> {
-  configurations["compileClasspath"].forEach { file: File ->
-    from(zipTree(file.absoluteFile))
-  }
-  manifest {
-    attributes(
-        mapOf(
-            "Main-Class" to "net.lab0.shell.Application"
-        )
-    )
-  }
-}
 
 tasks {
   task<Exec>("htmlDeps") {
     dependsOn("htmlDependencyReport")
     val browser = "/usr/bin/sensible-browser"
     commandLine(browser, "build/reports/project/dependencies/index.html")
+  }
+
+  val fatJar by creating(OneJar::class.java) {
+      mainClass = "net.lab0.nebula.reloaded.ui.Start.java"
   }
 }

@@ -30,7 +30,7 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
   /**
    * Complex plan points per pixel
    */
-  val resolutionIndex = 10
+  var resolutionIndex = 10
   val pointsPerSide = 16
   var minIterations: Long = 100
   var maxIterations: Long = 10000

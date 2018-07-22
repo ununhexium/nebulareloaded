@@ -46,7 +46,9 @@
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <toolTipText value="Coordinates in the complex plane"/>
+                    </properties>
                     <border type="etched" title="Plan"/>
                     <children>
                       <component id="98ed9" class="javax.swing.JLabel">
@@ -98,6 +100,7 @@
                         </constraints>
                         <properties>
                           <text value="0"/>
+                          <toolTipText value="Iterations to escape the Mandelbrot set at the selected point"/>
                         </properties>
                       </component>
                       <component id="d51e0" class="javax.swing.JLabel">
@@ -115,7 +118,9 @@
                     <constraints>
                       <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <toolTipText value="Image coordinates"/>
+                    </properties>
                     <border type="etched" title="Raster"/>
                     <children>
                       <component id="24676" class="javax.swing.JLabel">
@@ -168,6 +173,7 @@
                     </constraints>
                     <properties>
                       <text value="Full reset"/>
+                      <toolTipText value="Resets all the viewports to the default viewport"/>
                     </properties>
                   </component>
                   <component id="bc0ee" class="javax.swing.JButton" binding="moreNodesButton" default-binding="true">
@@ -176,6 +182,7 @@
                     </constraints>
                     <properties>
                       <text value="More nodes"/>
+                      <toolTipText value="Computes mode nodes in the index tree"/>
                     </properties>
                   </component>
                   <grid id="79641" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -193,6 +200,7 @@
                         <properties>
                           <selected value="true"/>
                           <text value="Draw fractal"/>
+                          <toolTipText value="Draw fractals in their rendering windows"/>
                         </properties>
                       </component>
                       <component id="40bdc" class="javax.swing.JCheckBox" binding="drawNodes">
@@ -202,6 +210,7 @@
                         <properties>
                           <selected value="false"/>
                           <text value="Tree"/>
+                          <toolTipText value="Draw the indexation tree over the Mandelbrot set"/>
                         </properties>
                       </component>
                       <component id="16e15" class="javax.swing.JCheckBox" binding="syncCheckbox">
@@ -210,6 +219,7 @@
                         </constraints>
                         <properties>
                           <text value="Sync"/>
+                          <toolTipText value="Keep fractals' viewports in sync"/>
                         </properties>
                       </component>
                       <component id="8ac88" class="javax.swing.JCheckBox" binding="forceRenderingCheckbox">
@@ -218,6 +228,7 @@
                         </constraints>
                         <properties>
                           <text value="Force rendering"/>
+                          <toolTipText value="Forces the rendering of the fractales which are not shown."/>
                         </properties>
                       </component>
                     </children>
@@ -234,7 +245,9 @@
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <toolTipText value="Red: inside, green: edge, blue: outside"/>
+                        </properties>
                       </component>
                     </children>
                   </grid>
@@ -329,7 +342,7 @@
                   </grid>
                 </children>
               </tabbedpane>
-              <grid id="60c9a" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="60c9a" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
                   <splitpane position="right"/>
@@ -352,6 +365,7 @@
                           </grid>
                         </constraints>
                         <properties>
+                          <toolTipText value="Maximum iteration for rendering the Mandelbrot set in the UI"/>
                           <visible value="true"/>
                         </properties>
                       </component>
@@ -359,7 +373,9 @@
                         <constraints>
                           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <toolTipText value="Fancy things"/>
+                        </properties>
                       </component>
                       <component id="f91ae" class="javax.swing.JLabel">
                         <constraints>
@@ -381,18 +397,18 @@
                   </grid>
                   <vspacer id="bc353">
                     <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                     </constraints>
                   </vspacer>
-                  <grid id="30398" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="30398" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
-                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties/>
                     <border type="etched" title="Nebulabrot"/>
                     <children>
-                      <grid id="4a725" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                      <grid id="4a725" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                         <margin top="0" left="0" bottom="0" right="0"/>
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -430,8 +446,38 @@
                           </component>
                         </children>
                       </grid>
+                      <grid id="59eb0" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="0"/>
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                        <border type="etched" title="Resolution"/>
+                        <children>
+                          <component id="95881" class="javax.swing.JSpinner" binding="resolutionSelector">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="ae5a7" class="javax.swing.JLabel" binding="resolutionLabel">
+                            <constraints>
+                              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <text value="Grain: 0.125"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
                     </children>
                   </grid>
+                  <component id="21e50" class="javax.swing.JSeparator">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
                 </children>
               </grid>
             </children>
