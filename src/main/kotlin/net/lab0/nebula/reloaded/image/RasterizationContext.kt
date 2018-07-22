@@ -33,10 +33,10 @@ class RasterizationContext(
           (yCenter - ((img - viewport.midY) / pixelSide)).toInt()
       )
 
-  fun convertPlanToImageX(real: Double) =
+  fun convertPlanRealToImageX(real: Double) =
       (((real - viewport.midX) / pixelSide) + xCenter).toInt()
 
-  fun convertPlanToImageY(img: Double) =
+  fun convertPlanImgToImageY(img: Double) =
       (yCenter - ((img - viewport.midY) / pixelSide)).toInt()
 
 
@@ -45,7 +45,13 @@ class RasterizationContext(
 
   fun convertImageToPlan(x: Int, y: Int) =
       PlanCoordinates(
-          pixelSide * (x - xCenter) + viewport.midX,
-          -pixelSide * (y - yCenter) + viewport.midY
+          convertImageXToPlanReal(x),
+          convertImageYToPlanImg(y)
       )
+
+  fun convertImageXToPlanReal(x: Int) =
+      pixelSide * (x - xCenter) + viewport.midX
+
+  fun convertImageYToPlanImg(y: Int) =
+      -pixelSide * (y - yCenter) + viewport.midY
 }

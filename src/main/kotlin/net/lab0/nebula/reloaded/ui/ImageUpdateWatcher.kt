@@ -27,9 +27,11 @@ class ImageUpdateWatcher(
       try {
         log.debug("Waiting for an image refresh event")
         queue.take()
-        panel.doRendering()
-        EventQueue.invokeAndWait {
-          panel.repaint()
+        if(panel.width > 0 && panel.height > 0){
+          panel.doRendering()
+          EventQueue.invokeAndWait {
+            panel.repaint()
+          }
         }
       }
       catch (e: InterruptedException) {

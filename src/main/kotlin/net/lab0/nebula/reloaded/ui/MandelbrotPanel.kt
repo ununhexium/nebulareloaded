@@ -3,7 +3,6 @@ package net.lab0.nebula.reloaded.ui
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine
 import net.lab0.nebula.reloaded.image.MandelbrotRenderer
-import net.lab0.nebula.reloaded.image.RasterizationContext
 import net.lab0.nebula.reloaded.image.withAlpha
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.INSIDE
@@ -15,31 +14,21 @@ import java.awt.Color
 import java.awt.EventQueue
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.event.MouseEvent
-import java.awt.geom.AffineTransform
 import java.util.concurrent.atomic.AtomicReference
-import javax.swing.JLabel
 
 class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContext>) :
     FractalPanel(computeContextRef) {
 
   private var iterationLimit = 512L
 
-  private var drawFractal = true
   private var drawTree = true
-
-  private var selectionBox: Pair<MouseEvent, MouseEvent>? = null
-
-  private val lastRenderingRef = AtomicReference<RenderingContext>()
-
 
   override fun paintComponent(graphics: Graphics) {
     super.paintComponent(graphics)
     val g = graphics as Graphics2D
-    val rasterizationContext = getRasterizationContext()
 
     synchronized(lastRenderingRef) {
-      paintLatestFractalRendering(rasterizationContext, g)
+      paintLatestFractalRendering(g)
     }
 
     if (drawTree) {
@@ -67,41 +56,6 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     )
     log.debug("Found ${toRender.size} nodes to render")
     renderAreas(g, toRender)
-  }
-
-  private fun paintLatestFractalRendering(
-      rasterizationContext: RasterizationContext,
-      g: Graphics2D
-  ) {
-    if (drawFractal && lastRenderingRef.get() != null) {
-      /**
-       * compute the position difference between the last rendering and
-       * the current rendering. This is necessary as the repaint may happen
-       * between the moment the image moved and the image is recomputed.
-       *
-       * If we are in such a situation, repaint the part of the image that
-       * can be updated while waiting for the next image to be rendered.
-       */
-
-      val lastViewport = lastRenderingRef.get().viewport
-      val previousCenter = rasterizationContext.convert(lastViewport.center)
-      val currentCenter = rasterizationContext.convert(viewport.center)
-
-      val xOffset = previousCenter.x - currentCenter.x
-      val yOffset = previousCenter.y - currentCenter.y
-
-      log.debug("Drawing offset: $xOffset;$yOffset")
-
-      val affineTransform = AffineTransform(
-          1.0, // no X scaling
-          0.0, // no Y shearing
-          0.0, // no X shearing
-          1.0, // no Y scaling
-          xOffset.toDouble(),
-          yOffset.toDouble()
-      )
-      g.drawRenderedImage(lastRenderingRef.get().rendering, affineTransform)
-    }
   }
 
   private fun renderAreas(
@@ -162,10 +116,6 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     }
   }
 
-  fun setSelectionBox(startToEnd: Pair<MouseEvent, MouseEvent>?) {
-    this.selectionBox = startToEnd
-  }
-
   fun setComputeEngine(computeEngine: MandelbrotComputeEngine) {
     log.debug("Switching compute engine to $computeEngine")
     object : Thread() {
@@ -176,18 +126,6 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
         )
       }
     }.start()
-  }
-
-  fun setShowFractal(enabled: Boolean) {
-    this.drawFractal = enabled
-    if (this.drawFractal) {
-      asyncUpdateRendering()
-    }
-    else {
-      EventQueue.invokeLater {
-        this.repaint()
-      }
-    }
   }
 
   fun setShowTree(selected: Boolean) {
@@ -207,8 +145,6 @@ class MandelbrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
     log.debug("Set iteration limit to $limit")
     asyncUpdateRendering()
   }
-
-  fun getIterationLimit() = this.iterationLimit
 
   // TODO extract nodes computing logic somewhere else
   fun computeTreeOnce() {

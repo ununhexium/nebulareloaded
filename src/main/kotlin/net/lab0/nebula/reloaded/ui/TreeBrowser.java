@@ -98,11 +98,17 @@ public class TreeBrowser {
     setTabsNames();
     initIterations();
     setDisplayOptions();
+    refreshDisplays();
+  }
+
+  private void refreshDisplays() {
+    mandelbrotPanel.asyncUpdateRendering();
+    nebulabrotPanel.asyncUpdateRendering();
   }
 
   private void setDisplayOptions() {
+    drawFractal.setSelected(true);
     mandelbrotPanel.setShowTree(drawNodes.isSelected());
-    mandelbrotPanel.setShowFractal(drawFractal.isSelected());
   }
 
   private void initIterations() {
@@ -123,21 +129,34 @@ public class TreeBrowser {
   }
 
   private void linkMandelbrotPanel() {
+    FractalActions mandelbrotActions = new FractalActions(mandelbrotPanel);
+    FractalActions nebulaActions = new FractalActions(nebulabrotPanel);
 
-    MandelbrotActions mandelbrotActions = new MandelbrotActions(mandelbrotPanel);
+    linkLabels(nebulaActions);
+    linkLabels(mandelbrotActions);
 
-    mandelbrotActions.setRealValueLabel(realValue);
-    mandelbrotActions.setImgValueLabel(imgValue);
-    mandelbrotActions.setIterationsValueLabel(iterationsValue);
+    linkActions(nebulaActions, nebulabrotPanel);
+    linkActions(mandelbrotActions, mandelbrotPanel);
+  }
 
-    mandelbrotActions.setXValueLabel(xValue);
-    mandelbrotActions.setYValueLabel(yValue);
+  private void linkActions(
+      FractalActions fractalActions,
+      FractalPanel fractalPanel
+  ) {
+    fractalPanel.addMouseListener(fractalActions);
+    fractalPanel.addMouseMotionListener(fractalActions);
+    fractalPanel.addMouseWheelListener(fractalActions);
+    fractalPanel.addKeyListener(fractalActions);
+    fractalPanel.addComponentListener(fractalActions);
+  }
 
-    mandelbrotPanel.addMouseListener(mandelbrotActions);
-    mandelbrotPanel.addMouseMotionListener(mandelbrotActions);
-    mandelbrotPanel.addMouseWheelListener(mandelbrotActions);
-    mandelbrotPanel.addKeyListener(mandelbrotActions);
-    mandelbrotPanel.addComponentListener(mandelbrotActions);
+  private void linkLabels(FractalActions fractalActions) {
+    fractalActions.setRealValueLabel(realValue);
+    fractalActions.setImgValueLabel(imgValue);
+    fractalActions.setIterationsValueLabel(iterationsValue);
+
+    fractalActions.setXValueLabel(xValue);
+    fractalActions.setYValueLabel(yValue);
   }
 
   private void createUIComponents() {

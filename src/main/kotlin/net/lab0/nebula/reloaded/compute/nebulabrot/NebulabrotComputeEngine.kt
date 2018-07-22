@@ -1,12 +1,14 @@
 package net.lab0.nebula.reloaded.compute.nebulabrot
 
-import net.lab0.nebula.reloaded.tree.PointWithIterationLimit
+import net.lab0.nebula.reloaded.tree.ComplexPoint
 import net.lab0.nebula.reloaded.ui.RenderingContext
 
 interface NebulabrotComputeEngine {
+
   fun compute(
-      points: Iterable<PointWithIterationLimit>,
-      context: RenderingContext
+      points: Sequence<ComplexPoint>,
+      context: RenderingContext,
+      lowIterationLimit: Int
   )
 
   /**

@@ -15,7 +15,7 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 import javax.swing.JLabel
 
-open class FractalActions(private val panel: MandelbrotPanel) :
+open class FractalActions(private val panel: FractalPanel) :
     MouseListener,
     MouseMotionListener,
     KeyListener,
@@ -74,7 +74,6 @@ open class FractalActions(private val panel: MandelbrotPanel) :
   }
 
   override fun mouseDragged(e: MouseEvent) {
-    panel.setSelectionBox(null)
     val tmpLastMousePosition = lastMousePosition
     if (tmpLastMousePosition != null) {
       panel.moveViewport(tmpLastMousePosition to e)
@@ -124,7 +123,7 @@ open class FractalActions(private val panel: MandelbrotPanel) :
         .iterationsAt(
             planCoordinates.real,
             planCoordinates.img,
-            panel.getIterationLimit()
+            panel.computeContextRef.get().tree.metadata.iterationLimit
         ).toString()
 
     xValueLabel.text = e.x.toString()

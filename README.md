@@ -38,3 +38,10 @@ Writing smaller classes, splitting the code regularly as classes have too much l
 
 Multithreading GUI update is still not trivial.
 
+Repeated mistakes:
+ 
+* making a mistake again for rectangle overlaping that lead me to the same stackoverflow explanation as last time about how to do it properly.
+
+* messing up with viewpoints with then leads to slightly-off-but-still-usable component behaviour.
+
+

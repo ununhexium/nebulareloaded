@@ -1,25 +1,41 @@
 package net.lab0.nebula.reloaded.ui
 
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.image.ImageCoordinates
 import net.lab0.nebula.reloaded.image.PlanViewport
 import net.lab0.nebula.reloaded.image.RasterizationContext
-import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.tree.Rectangle
 import net.lab0.nebula.reloaded.tree.RectangleImpl
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.awt.EventQueue
+import java.awt.Graphics2D
 import java.awt.event.MouseEvent
+import java.awt.geom.AffineTransform
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.JPanel
 
-abstract class FractalPanel(val computeContextRef: AtomicReference<MandelbrotComputeContext>) : JPanel() {
+abstract class FractalPanel(
+    val computeContextRef: AtomicReference<MandelbrotComputeContext>
+) : JPanel() {
   companion object {
     private val TOKEN = Object()
+
+    private val log: Logger by lazy {
+      LoggerFactory
+          .getLogger(this::class.java.name)
+    }
   }
 
   var viewport = createDefaultViewport()
     private set
 
+
+  private var drawFractal = true
+
+  protected val lastRenderingRef = AtomicReference<RenderingContext>()
   /**
    * Event store to tell that an image update event has been received.
    */
@@ -31,7 +47,6 @@ abstract class FractalPanel(val computeContextRef: AtomicReference<MandelbrotCom
 
 
   init {
-    asyncUpdateRendering()
     imageUpdateWatcher.execute(ImageUpdateWatcher(this, blockingQueue))
     /*
      * We only want to notify.
@@ -96,4 +111,53 @@ abstract class FractalPanel(val computeContextRef: AtomicReference<MandelbrotCom
   }
 
   internal abstract fun doRendering()
+
+
+  protected fun paintLatestFractalRendering(
+      g: Graphics2D
+  ) {
+    if (drawFractal && lastRenderingRef.get() != null) {
+      /**
+       * compute the position difference between the last rendering and
+       * the current rendering. This is necessary as the repaint may happen
+       * between the moment the image moved and the image is recomputed.
+       *
+       * If we are in such a situation, repaint the part of the image that
+       * can be updated while waiting for the next image to be rendered.
+       */
+
+      val rasterizationContext = getRasterizationContext()
+
+      val lastViewport = lastRenderingRef.get().viewport
+      val previousCenter = rasterizationContext.convert(lastViewport.center)
+      val currentCenter = rasterizationContext.convert(viewport.center)
+
+      val xOffset = previousCenter.x - currentCenter.x
+      val yOffset = previousCenter.y - currentCenter.y
+
+      log.debug("Drawing offset: $xOffset;$yOffset")
+
+      val affineTransform = AffineTransform(
+          1.0, // no X scaling
+          0.0, // no Y shearing
+          0.0, // no X shearing
+          1.0, // no Y scaling
+          xOffset.toDouble(),
+          yOffset.toDouble()
+      )
+      g.drawRenderedImage(lastRenderingRef.get().rendering, affineTransform)
+    }
+  }
+
+  fun setShowFractal(enabled: Boolean) {
+    this.drawFractal = enabled
+    if (this.drawFractal) {
+      asyncUpdateRendering()
+    }
+    else {
+      EventQueue.invokeLater {
+        this.repaint()
+      }
+    }
+  }
 }

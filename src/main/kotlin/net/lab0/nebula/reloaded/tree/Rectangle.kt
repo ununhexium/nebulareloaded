@@ -85,8 +85,13 @@ interface Rectangle {
     }
   }
 
+//  fun overlaps(other: Rectangle) =
+//      other.corners.any { this.contains(it) } ||
+//          this.corners.any { other.contains(it) }
+
+
   fun overlaps(other: Rectangle) =
-      other.corners.any { this.contains(it) } ||
-          this.corners.any { other.contains(it) }
+      this.minX < other.maxX && this.maxX > other.minX &&
+          this.maxY > other.minY && this.minY < other.maxY
 }
 

@@ -7,8 +7,9 @@ import net.lab0.nebula.reloaded.ui.RenderingContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.image.BufferedImage
+import kotlin.streams.asStream
 
-class DefaultNebulabrotComputeEngine : NebulabrotComputeEngine {
+class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
 
   companion object {
     private val log: Logger by lazy {
@@ -36,6 +37,11 @@ class DefaultNebulabrotComputeEngine : NebulabrotComputeEngine {
     val resultMatrix = Array(context.height) { LongArray(context.width) { 0 } }
 
     points
+        .asStream()
+        .parallel()
+        .filter {
+          !stop
+        }
         .map {
           it to mandelbrotComputeEngine.iterationsAt(
               it.real,
@@ -44,7 +50,8 @@ class DefaultNebulabrotComputeEngine : NebulabrotComputeEngine {
           )
         }
         .filter {
-          it.second < context.iterationLimit
+          it.second < context.iterationLimit &&
+          it.second > lowIterationLimit
         }
         .forEach {
           compute(
@@ -54,7 +61,6 @@ class DefaultNebulabrotComputeEngine : NebulabrotComputeEngine {
               rasterizationContext,
               resultMatrix
           )
-          if (stop) return@forEach
         }
 
     log.debug("Coloring nebula")
@@ -62,7 +68,8 @@ class DefaultNebulabrotComputeEngine : NebulabrotComputeEngine {
     val max = resultMatrix.maxBy { it.max()!! }!!.max()!!
     val average = resultMatrix.map { it.average() }.average().toLong()
     val rangeCandidate = max - min
-    val range = if (rangeCandidate == 0L) 1 else rangeCandidate
+    val range = if (rangeCandidate == 0L) 1.0
+    else Math.log(rangeCandidate.toDouble())
 
     val image = BufferedImage(
         context.width,
@@ -71,11 +78,13 @@ class DefaultNebulabrotComputeEngine : NebulabrotComputeEngine {
     )
     val raster = image.raster
 
-    val color = FloatArray(3)
+    val color = DoubleArray(3)
     resultMatrix.forEachIndexed { lineIndex, line ->
       line.forEachIndexed { pixelIndex, pixel ->
-        val colorValue = 255f * (pixel - min) / range
+        val colorValue = 255f * Math.log((pixel - min).toDouble()) / range
         color[0] = colorValue
+        color[1] = colorValue
+        color[2] = colorValue
         raster.setPixel(pixelIndex, lineIndex, color)
       }
     }
