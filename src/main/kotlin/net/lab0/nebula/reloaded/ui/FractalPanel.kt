@@ -76,7 +76,6 @@ abstract class FractalPanel(val computeContextRef: AtomicReference<MandelbrotCom
     val newPosition = context.convert(to)
     viewport = viewport.translate(oldPosition.minus(newPosition))
     repaint()
-    asyncUpdateRendering()
   }
 
   internal fun getRasterizationContext(): RasterizationContext {
