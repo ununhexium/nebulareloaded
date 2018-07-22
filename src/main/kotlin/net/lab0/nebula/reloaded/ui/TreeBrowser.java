@@ -1,8 +1,8 @@
 package net.lab0.nebula.reloaded.ui;
 
+import net.lab0.nebula.reloaded.compute.mandelbrot.Engines;
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext;
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine;
-import net.lab0.nebula.reloaded.compute.mandelbrot.Engines;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +39,7 @@ public class TreeBrowser {
   private JButton refreshButton;
   private SurfaceIndicator surfaceIndicator;
   private JLabel iterationsValue;
+  private NebulabrotPanel nebulabrotPanel;
 
   public TreeBrowser() {
     viewportReset.addActionListener(e -> mandelbrotPanel.resetViewport());
@@ -59,8 +60,9 @@ public class TreeBrowser {
       mandelbrotPanel.computeTreeOnce();
     });
     refreshButton.addActionListener(e -> {
-      new SwingWorker<Void,Void>(){
+      new SwingWorker<Void, Void>() {
         private InEdgeOutUndef surfaces;
+
         @Override
         protected Void doInBackground()
         throws Exception {
@@ -79,6 +81,8 @@ public class TreeBrowser {
         }
       }.execute();
     });
+
+    finishSetup();
   }
 
   public JPanel getMainPanel() {
@@ -93,6 +97,12 @@ public class TreeBrowser {
     populateComputeEngineList();
     setTabsNames();
     initIterations();
+    setDisplayOptions();
+  }
+
+  private void setDisplayOptions() {
+    mandelbrotPanel.setShowTree(drawNodes.isSelected());
+    mandelbrotPanel.setShowFractal(drawFractal.isSelected());
   }
 
   private void initIterations() {
@@ -134,8 +144,11 @@ public class TreeBrowser {
   }
 
   private void createUIComponents() {
-    MandelbrotComputeContext computeContext = new MandelbrotComputeContext();
-    AtomicReference<MandelbrotComputeContext> computeContextRef = new AtomicReference<>(computeContext);
+    MandelbrotComputeContext context = new MandelbrotComputeContext();
+    AtomicReference<MandelbrotComputeContext> computeContextRef = new AtomicReference<>(context);
+
     mandelbrotPanel = new MandelbrotPanel(computeContextRef);
+    nebulabrotPanel = new NebulabrotPanel(computeContextRef);
   }
+
 }

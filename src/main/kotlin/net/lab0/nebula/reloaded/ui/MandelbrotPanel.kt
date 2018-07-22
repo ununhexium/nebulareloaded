@@ -1,6 +1,6 @@
 package net.lab0.nebula.reloaded.ui
 
-import net.lab0.nebula.reloaded.compute.mandelbrot.ComputeContext
+import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeContext
 import net.lab0.nebula.reloaded.compute.mandelbrot.MandelbrotComputeEngine
 import net.lab0.nebula.reloaded.image.MandelbrotRenderer
 import net.lab0.nebula.reloaded.image.RasterizationContext

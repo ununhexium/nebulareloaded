@@ -60,6 +60,7 @@ repositories {
 dependencies {
 
   compile("com.google.guava:guava:$guavaVersion")
+  compile("com.intellij:darculalaf:0.1")
 
   compile("net.lab0.kotlin.more:morekotlin:0.1.2")
 
