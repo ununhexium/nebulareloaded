@@ -1,7 +1,5 @@
 package net.lab0.nebula.reloaded.compute.mandelbrot
 
-import java.util.stream.IntStream
-
 class StreamMandelbrotComputeEngine(
     val computeEngine: MandelbrotComputeEngine,
     private val parallel: Boolean = true
@@ -19,7 +17,7 @@ class StreamMandelbrotComputeEngine(
       img: DoubleArray,
       iterationLimit: Long
   ): LongArray {
-    val indexes = IntStream.range(0, real.size)
+    val indexes = (0 until real.size).toList().stream()
     val stream = if (parallel) indexes.parallel() else indexes
     return stream.mapToLong {
       computeEngine.iterationsAt(real[it], img[it], iterationLimit)

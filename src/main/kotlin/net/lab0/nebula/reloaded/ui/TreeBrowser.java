@@ -200,8 +200,8 @@ public class TreeBrowser {
     nebulaMaximumIteration.setValue(4096);
     nebulabrotPanel.setMaxIterations((Integer) nebulaMaximumIteration.getValue());
 
-    resolutionSelector.setValue(10);
-    updateResolutionIndex(10);
+    resolutionSelector.setValue(9);
+    updateResolutionIndex(9);
   }
 
   private void updateResolutionIndex(int resolutionIndex) {

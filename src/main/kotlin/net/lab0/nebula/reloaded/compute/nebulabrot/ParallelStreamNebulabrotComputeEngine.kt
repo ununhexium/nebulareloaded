@@ -25,7 +25,9 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
   override fun compute(
       points: Sequence<ComplexPoint>,
       context: RenderingContext,
-      lowIterationLimit: Long
+      lowIterationLimit: Long,
+      colorBounds: List<Long>,
+      interpolation: (Long, Long, Long, Long) -> Long
   ) {
 
     val rasterizationContext = RasterizationContext(
@@ -34,7 +36,11 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
         context.height
     )
 
-    val resultMatrix = Array(context.height) { LongArray(context.width) { 0 } }
+    val resultMatrices = Array(colorBounds.size) {
+      Array(context.height) {
+        LongArray(context.width) { 0 }
+      }
+    }
 
     points
         .asStream()
@@ -51,7 +57,7 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
         }
         .filter {
           it.second < context.iterationLimit &&
-          it.second > lowIterationLimit
+              it.second > lowIterationLimit
         }
         .forEach {
           compute(
@@ -59,17 +65,14 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
               it.first.img,
               it.second,
               rasterizationContext,
-              resultMatrix
+              resultMatrices[getResultMatrixIndex(colorBounds, it.second)]
           )
         }
 
     log.debug("Coloring nebula")
-    val min = resultMatrix.minBy { it.min()!! }!!.min()!!
-    val max = resultMatrix.maxBy { it.max()!! }!!.max()!!
-    val average = resultMatrix.map { it.average() }.average().toLong()
-    val rangeCandidate = max - min
-    val range = if (rangeCandidate == 0L) 1.0
-    else Math.log(rangeCandidate.toDouble())
+    resultMatrices.forEach {
+      mapToPixelValue(it, context, interpolation)
+    }
 
     val image = BufferedImage(
         context.width,
@@ -78,20 +81,41 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
     )
     val raster = image.raster
 
-    val color = DoubleArray(3)
-    resultMatrix.forEachIndexed { lineIndex, line ->
-      line.forEachIndexed { pixelIndex, pixel ->
-        val colorValue = 255f * Math.log((pixel - min).toDouble()) / range
-        color[0] = colorValue
-        color[1] = colorValue
-        color[2] = colorValue
-        raster.setPixel(pixelIndex, lineIndex, color)
+    val color = IntArray(3)
+    (0 until context.height).forEach { y ->
+      (0 until context.width).forEach { x ->
+        color[0] = resultMatrices[1][y][x].toInt()
+        color[1] = resultMatrices[2][y][x].toInt()
+        color[2] = resultMatrices[0][y][x].toInt()
+        raster.setPixel(x, y, color)
       }
     }
 
     image.data = raster
     context.rendering = image
   }
+
+  private fun mapToPixelValue(
+      it: Array<LongArray>,
+      context: RenderingContext,
+      iterpolation: (Long, Long, Long, Long) -> Long
+  ) {
+    val min = it.minBy { it.min()!! }!!.min()!!
+    val max = it.maxBy { it.max()!! }!!.max()!!
+    val average = it.map { it.average() }.average().toLong()
+
+    (0 until context.height).forEach { y ->
+      (0 until context.width).forEach { x ->
+        val pixel = it[y][x]
+        it[y][x] = iterpolation(min, average, max, pixel)
+      }
+    }
+  }
+
+  private fun getResultMatrixIndex(
+      colorBounds: List<Long>,
+      iterationLimit: Long
+  ) = colorBounds.indexOfFirst { it >= iterationLimit }
 
   fun compute(
       real: Double,

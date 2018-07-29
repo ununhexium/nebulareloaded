@@ -7,6 +7,7 @@ val guavaVersion = "25.1-jre"
 val junitPlatformVersion = "1.2.0"
 val junitJupiterVersion = "5.2.0"
 val springShellVersion = "2.0.1.RELEASE"
+val lwjglVersion = "3.1.6"
 
 version = "0.0.1-SNAPSHOT"
 group = "net.lab0.nebula.reloaded"
@@ -73,7 +74,14 @@ dependencies {
   compile("org.jetbrains.kotlin:kotlin-reflect")
 
   compile("org.slf4j:slf4j-api:1.7.25")
-  compile("org.slf4j:slf4j-jdk14:1.7.25")
+  compile("org.slf4j:slf4j-simple:1.7.25")
+
+
+  compile("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+  compile("org.lwjgl:lwjgl-opencl:$lwjglVersion")
+  compile("org.lwjgl:lwjgl-opencl:$lwjglVersion:native")
+  compile("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+  compile("org.lwjgl:lwjgl-opengl:$lwjglVersion:native")
 
 //  compile("org.springframework:spring-core")
 //  compile("org.springframework.shell:spring-shell-starter:$springShellVersion")
@@ -86,6 +94,10 @@ dependencies {
 
 tasks.withType<Test> {
   useJUnitPlatform()
+}
+
+tasks.withType<Test> {
+  systemProperty("java.library.path", "/home/ununhexium/dev/lwjgl/natives")
 }
 
 
