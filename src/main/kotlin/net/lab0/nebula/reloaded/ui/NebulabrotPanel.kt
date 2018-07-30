@@ -38,8 +38,12 @@ class NebulabrotPanel(computeContextRef: AtomicReference<MandelbrotComputeContex
   override fun doRendering() {
 
     val resolution = getResolution()
-    log
-        .debug("Rendering Nebulabrot with min=$minIterations, max=$maxIterations, pointsPerSide=$pointsPerSide, resolution=$resolution")
+    log.debug(
+        "Rendering Nebulabrot with min=$minIterations, " +
+            "max=$maxIterations, " +
+            "pointsPerSide=$pointsPerSide, " +
+            "resolution=$resolution"
+    )
 
     val computeContext = computeContextRef.get()
 

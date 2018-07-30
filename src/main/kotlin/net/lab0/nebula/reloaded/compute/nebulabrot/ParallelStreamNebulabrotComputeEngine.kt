@@ -84,8 +84,8 @@ class ParallelStreamNebulabrotComputeEngine : NebulabrotComputeEngine {
     val color = IntArray(3)
     (0 until context.height).forEach { y ->
       (0 until context.width).forEach { x ->
-        color[0] = resultMatrices[1][y][x].toInt()
-        color[1] = resultMatrices[2][y][x].toInt()
+        color[0] = resultMatrices[2][y][x].toInt()
+        color[1] = resultMatrices[1][y][x].toInt()
         color[2] = resultMatrices[0][y][x].toInt()
         raster.setPixel(x, y, color)
       }
