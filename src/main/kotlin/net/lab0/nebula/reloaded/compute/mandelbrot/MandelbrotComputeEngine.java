@@ -10,10 +10,10 @@ public interface MandelbrotComputeEngine {
   long iterationsAt(double real, double img, long iterationLimit);
 
   /**
-   * @param real
-   * @param img
+   * @param reals
+   * @param imgs
    * @param iterationLimit
    * @return
    */
-  long[] iterationsAt(double[] real, double[] img, long iterationLimit);
+  long[] iterationsAt(double[] reals, double[] imgs, long iterationLimit);
 }

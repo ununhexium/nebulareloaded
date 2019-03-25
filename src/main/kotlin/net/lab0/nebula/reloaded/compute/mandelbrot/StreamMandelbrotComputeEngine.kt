@@ -3,25 +3,16 @@ package net.lab0.nebula.reloaded.compute.mandelbrot
 class StreamMandelbrotComputeEngine(
     val computeEngine: MandelbrotComputeEngine,
     private val parallel: Boolean = true
-) : MandelbrotComputeEngine {
+) : MandelbrotComputeEngine by computeEngine {
   override fun iterationsAt(
-      real: Double,
-      img: Double,
-      iterationLimit: Long
-  ): Long {
-    TODO("not implemented")
-  }
-
-  override fun iterationsAt(
-      real: DoubleArray,
-      img: DoubleArray,
+      reals: DoubleArray,
+      imgs: DoubleArray,
       iterationLimit: Long
   ): LongArray {
-    val indexes = (0 until real.size).toList().stream()
+    val indexes = (0 until reals.size).toList().stream()
     val stream = if (parallel) indexes.parallel() else indexes
     return stream.mapToLong {
-      computeEngine.iterationsAt(real[it], img[it], iterationLimit)
+      computeEngine.iterationsAt(reals[it], imgs[it], iterationLimit)
     }.toArray()
   }
-
 }

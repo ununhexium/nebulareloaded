@@ -2,13 +2,6 @@ import com.github.rholder.gradle.task.OneJar
 import groovy.xml.dom.DOMCategory.attributes
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val assertJVersion = "3.10.0"
-val guavaVersion = "25.1-jre"
-val junitPlatformVersion = "1.2.0"
-val junitJupiterVersion = "5.2.0"
-val springShellVersion = "2.0.1.RELEASE"
-val lwjglVersion = "3.1.6"
-
 version = "0.0.1-SNAPSHOT"
 group = "net.lab0.nebula.reloaded"
 
@@ -28,8 +21,6 @@ plugins {
   idea
   java
   id("org.jetbrains.kotlin.jvm") version kotlinVersion
-//  id("org.springframework.boot") version "2.0.3.RELEASE"
-//  id("io.spring.dependency-management") version "1.0.5.RELEASE"
   id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
 }
 
@@ -61,12 +52,17 @@ repositories {
   jcenter()
 }
 
+val classifier = "linux-x86_64"
+
 dependencies {
+  val assertJVersion = "3.10.0"
+  val guavaVersion = "25.1-jre"
+  val junitJupiterVersion = "5.2.0"
 
   compile("com.google.guava:guava:$guavaVersion")
-  compile("com.intellij:darculalaf:0.1")
+//  compile("com.intellij:darculalaf:0.1")
 
-  compile("net.lab0.kotlin.more:morekotlin:0.1.2")
+//  compile("net.lab0.kotlin.more:morekotlin:0.1.2")
 
   compile("org.funktionale:funktionale-currying:1.2")
 
@@ -75,13 +71,19 @@ dependencies {
 
   compile("org.slf4j:slf4j-api:1.7.25")
   compile("org.slf4j:slf4j-simple:1.7.25")
+  
+  val jCudaVersion = "0.9.2"
+  compile("org.jcuda:jcuda:0.9.2") {
+    isTransitive = false
+  }
+  compile("org.jcuda", "jcuda-natives", jCudaVersion, classifier = classifier)
 
-
-  compile("org.lwjgl:lwjgl-glfw:$lwjglVersion")
-  compile("org.lwjgl:lwjgl-opencl:$lwjglVersion")
-  compile("org.lwjgl:lwjgl-opencl:$lwjglVersion:native")
-  compile("org.lwjgl:lwjgl-opengl:$lwjglVersion")
-  compile("org.lwjgl:lwjgl-opengl:$lwjglVersion:native")
+//  val lwjglVersion = "3.1.6"
+//  compile("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+//  compile("org.lwjgl:lwjgl-opencl:$lwjglVersion")
+//  compile("org.lwjgl:lwjgl-opencl:$lwjglVersion:native")
+//  compile("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+//  compile("org.lwjgl:lwjgl-opengl:$lwjglVersion:native")>
 
 //  compile("org.springframework:spring-core")
 //  compile("org.springframework.shell:spring-shell-starter:$springShellVersion")
@@ -109,6 +111,6 @@ tasks {
   }
 
   val fatJar by creating(OneJar::class.java) {
-      mainClass = "net.lab0.nebula.reloaded.ui.Start.java"
+    mainClass = "net.lab0.nebula.reloaded.ui.Start.java"
   }
 }

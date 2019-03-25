@@ -21,8 +21,13 @@ object Engines {
     override fun toString() = "Thread Optim2"
   }
 
+  object CudaComputeEngine:
+      MandelbrotComputeEngine by CudaMandelbrotComputeEngine(){
+    override fun toString() = "Cuda"
+  }
+
   // TODO get list by reflection
   val computeEngines = listOf(
-      Default, Optim2, MaxParallelStreamOptim2, MaxParallelThreadOptim2
+      Default, Optim2, MaxParallelStreamOptim2, MaxParallelThreadOptim2, CudaComputeEngine
   )
 }

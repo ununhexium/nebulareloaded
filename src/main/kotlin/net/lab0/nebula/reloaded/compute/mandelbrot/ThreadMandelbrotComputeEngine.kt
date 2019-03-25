@@ -6,7 +6,7 @@ import java.util.concurrent.Executors
 class ThreadMandelbrotComputeEngine(
     private val computeEngine: MandelbrotComputeEngine,
     private val maxThreadCount: Int = Runtime.getRuntime().availableProcessors()
-) : MandelbrotComputeEngine {
+) : MandelbrotComputeEngine by computeEngine {
   private val executor = Executors.newFixedThreadPool(maxThreadCount)
 
   init {
@@ -16,24 +16,16 @@ class ThreadMandelbrotComputeEngine(
   }
 
   override fun iterationsAt(
-      real: Double,
-      img: Double,
-      iterationLimit: Long
-  ): Long {
-    TODO("not implemented")
-  }
-
-  override fun iterationsAt(
-      real: DoubleArray,
-      img: DoubleArray,
+      reals: DoubleArray,
+      imgs: DoubleArray,
       iterationLimit: Long
   ): LongArray {
-    val result = LongArray(real.size)
+    val result = LongArray(reals.size)
     val tasks = (0..maxThreadCount).map { offset ->
       Callable {
-        (offset until real.size step maxThreadCount).forEach {
+        (offset until reals.size step maxThreadCount).forEach {
           result[it] = computeEngine
-              .iterationsAt(real[it], img[it], iterationLimit)
+              .iterationsAt(reals[it], imgs[it], iterationLimit)
         }
       }
     }

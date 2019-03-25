@@ -26,10 +26,10 @@ public class DefaultMandelbrotComputeEngine implements MandelbrotComputeEngine {
   }
 
   @Override
-  public long[] iterationsAt(double[] real, double[] img, long iterationLimit) {
-    long[] iterations = new long[real.length];
-    for (int i = 0; i < real.length; ++i) {
-      iterations[i] = iterationsAt(real[i], img[i], iterationLimit);
+  public long[] iterationsAt(double[] reals, double[] imgs, long iterationLimit) {
+    long[] iterations = new long[reals.length];
+    for (int i = 0; i < reals.length; ++i) {
+      iterations[i] = iterationsAt(reals[i], imgs[i], iterationLimit);
     }
     return iterations;
   }
