@@ -21,8 +21,8 @@ object Engines {
     override fun toString() = "Thread Optim2"
   }
 
-  object CudaComputeEngine:
-      MandelbrotComputeEngine by CudaMandelbrotComputeEngine(){
+  object CudaComputeEngine :
+      MandelbrotComputeEngine by CudaMandelbrotComputeEngine() {
     override fun toString() = "Cuda"
   }
 

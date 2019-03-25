@@ -14,7 +14,15 @@ import java.io.IOException
 
 class CudaMandelbrotComputeEngine : MandelbrotComputeEngine {
 
-  private val context by lazy {
+  private val ptxFileName by lazy {
+    // calling the NVCC
+    preparePtxFile("Mandelbrot.cu")
+  }
+
+  private var init = false
+  private fun init() {
+    if (init) return
+
     JCudaDriver.setExceptionsEnabled(true)
 
     // Initialize the driver and create a context for the first device.
@@ -24,12 +32,7 @@ class CudaMandelbrotComputeEngine : MandelbrotComputeEngine {
     val context = CUcontext()
     JCudaDriver.cuCtxCreate(context, 0, device)
 
-    context
-  }
-
-  private val ptxFileName by lazy {
-    // calling the NVCC
-    preparePtxFile("Mandelbrot.cu")
+    init = true
   }
 
   @Deprecated("Come on... this is executed on a GPU...")
@@ -38,6 +41,8 @@ class CudaMandelbrotComputeEngine : MandelbrotComputeEngine {
   }
 
   override fun iterationsAt(reals: DoubleArray, imags: DoubleArray, iterationLimit: Long): LongArray {
+    init()
+
     val items = reals.size
 
     // Load the ptx file.
