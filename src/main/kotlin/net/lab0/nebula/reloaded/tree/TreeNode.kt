@@ -2,7 +2,6 @@ package net.lab0.nebula.reloaded.tree
 
 import net.lab0.nebula.reloaded.tree.PayloadStatus.EDGE
 import net.lab0.nebula.reloaded.tree.PayloadStatus.UNDEFINED
-import net.lab0.tools.delegated.NullableSetOnce
 
 /**
  * Custom quad tree designed to subdivide the Mandelbrot set.
@@ -36,7 +35,7 @@ class TreeNode(
   )
 
   val payload = IterationPayload(metadata.iterationLimit)
-  var children: Array<TreeNode>? by NullableSetOnce()
+  var children: Array<TreeNode>? = null
   val path: List<NodePosition>
     get() = if (parent == null) {
       listOf(NodePosition.ROOT)
